@@ -1,0 +1,4 @@
+RewriteEngine On
+
+RewriteBase "/top_clicker/"
+RewriteRule ^([0-9]+)$ ?num=$1  [L]
