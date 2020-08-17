@@ -1,4 +1,5 @@
 {
+  "private": true,
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^3.9.0",
     "@typescript-eslint/parser": "^3.9.0",
@@ -17,5 +18,8 @@
   "main": "index.js",
   "repository": "https://github.com/lockcept/lockcept.kr",
   "author": "lockcept <lockcept@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ]
 }
