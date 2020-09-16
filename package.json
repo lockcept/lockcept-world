@@ -30,8 +30,7 @@
   ],
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint . --fix",
-      "prettier --write"
+      "eslint . --fix"
     ]
   },
   "husky": {
