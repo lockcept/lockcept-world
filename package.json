@@ -1,0 +1,15 @@
+{
+  "name": "lockcept.kr",
+  "version": "0.1.0",
+  "main": "index.js",
+  "repository": "http://github.com/lockcept/lockcept.kr",
+  "author": "lockcept <lockcept@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "lerna": "^3.22.1"
+  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
