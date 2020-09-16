@@ -7,6 +7,7 @@
   "extends": [
     "plugin:react/recommended",
     "plugin:json/recommended",
+    "plugin:yaml/recommended",
     "airbnb",
     "airbnb-base",
     "plugin:prettier/recommended"
@@ -23,6 +24,6 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "plugins": ["react", "@typescript-eslint"],
+  "plugins": ["react", "yaml", "@typescript-eslint"],
   "rules": {}
 }
