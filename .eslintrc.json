@@ -25,5 +25,7 @@
     "sourceType": "module"
   },
   "plugins": ["react", "yaml", "@typescript-eslint"],
-  "rules": {}
+  "rules": {
+    "import/prefer-default-export": 0
+  }
 }
