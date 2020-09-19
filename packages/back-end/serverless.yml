@@ -18,12 +18,19 @@ org: lockcept
 
 plugins:
   - serverless-plugin-typescript
-  - serverless-offline
   - serverless-dynamodb-local
+  - serverless-offline
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
 frameworkVersion: "2"
+
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      migrate: true
 
 provider:
   name: aws
