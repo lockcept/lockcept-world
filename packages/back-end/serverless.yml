@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: back-end
+service: lockceptkr-back-end
 # app and org for use with dashboard.serverless.com
 app: back-end-app
 org: lockcept
@@ -19,6 +19,7 @@ org: lockcept
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
+  - serverless-dynamodb-local
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -106,14 +107,18 @@ functions:
 #    environment:
 #      variable2: value2
 
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+resources:
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: lockceptTable
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
