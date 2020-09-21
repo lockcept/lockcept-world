@@ -31,10 +31,23 @@ custom:
       - dev
     start:
       migrate: true
+  tables:
+    lockcept-table: lockcept-table-${self:provider.stage}
 
 provider:
   name: aws
+  stage: ${ opt:stage, "dev" }
   runtime: nodejs12.x
+  environment:
+    LOCKCEPT_TABLE: ${self:custom.tables.lockcept-table}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+      Resource: "*"
 
 # you can overwrite defaults here
 #  stage: dev
@@ -74,6 +87,18 @@ functions:
     handler: handler.hello
     events:
       - http: ANY /
+  postLockcept:
+    handler: src/handler/lockcept.post
+    events:
+      - http:
+          path: lockcept/{email}
+          method: get
+  getLockcept:
+    handler: src/handler/lockcept.get
+    events:
+      - http:
+          path: lockcept
+          method: get
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -116,15 +141,15 @@ functions:
 
 resources:
   Resources:
-    usersTable:
+    lockceptTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: lockceptTable
+        TableName: ${self:custom.tables.lockcept-table}
         AttributeDefinitions:
-          - AttributeName: email
+          - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: email
+          - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
