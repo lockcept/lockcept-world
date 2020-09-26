@@ -4,10 +4,16 @@ plugins:
   - serverless-plugin-typescript
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-domain-manager
 
 frameworkVersion: "2"
 
 custom:
+  customDomain:
+    domainName: "api.lockcept.kr"
+    basePath: ${self:provider.stage}
+    stage: ${self:provider.stage}
+    createRoute53Record: true
   serverless-offline:
     useChildProcesses: true
     httpPort: 4000
