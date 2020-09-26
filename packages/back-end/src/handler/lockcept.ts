@@ -1,14 +1,15 @@
 import { v4 as uuid } from "uuid";
-import { DynamoDB } from "aws-sdk";
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { config } from "../config";
-
-const dynamoDb = new DynamoDB.DocumentClient();
+import dynamodb from "../dynamodb/dynamodb";
 
 export const post: APIGatewayProxyHandler = (event, context, callback) => {
   const timestamp = new Date().getTime();
   const requestParams = event.pathParameters ?? {};
   const { email } = requestParams;
+
+  // eslint-disable-next-line no-console
+  console.log(email, config.table.lockcept);
 
   const params = {
     TableName: config.table.lockcept,
@@ -20,7 +21,7 @@ export const post: APIGatewayProxyHandler = (event, context, callback) => {
     },
   };
 
-  dynamoDb.put(params, (error) => {
+  dynamodb.put(params, (error) => {
     if (error) {
       // eslint-disable-next-line no-console
       console.error(error);
@@ -44,7 +45,7 @@ export const get: APIGatewayProxyHandler = (event, context, callback) => {
   const params = {
     TableName: config.table.lockcept,
   };
-  dynamoDb.scan(params, (error, result) => {
+  dynamodb.scan(params, (error, result) => {
     // handle potential errors
     if (error) {
       // eslint-disable-next-line no-console
