@@ -5,11 +5,11 @@
     "node": true
   },
   "extends": [
+    "airbnb",
+    "airbnb-base",
     "plugin:react/recommended",
     "plugin:json/recommended",
     "plugin:yaml/recommended",
-    "airbnb",
-    "airbnb-base",
     "plugin:prettier/recommended"
   ],
   "globals": {
@@ -38,9 +38,15 @@
       }
     ],
     "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": "error"
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ]
   },
   "settings": {
+    "import/core-modules": ["aws-sdk"],
     "import/resolver": {
       "node": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"],

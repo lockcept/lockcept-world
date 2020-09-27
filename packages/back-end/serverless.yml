@@ -48,19 +48,24 @@ functions:
   hello:
     handler: handler.hello
     events:
-      - http: ANY /
+      - http:
+          path: /
+          method: any
+          cors: true
   postLockcept:
     handler: src/handler/lockcept.post
     events:
       - http:
-          path: lockcept/{email}
+          path: /lockcept/{email}
           method: get
+          cors: true
   getLockcept:
     handler: src/handler/lockcept.get
     events:
       - http:
-          path: lockcept
+          path: /lockcept
           method: get
+          cors: true
 
 resources:
   Resources:
