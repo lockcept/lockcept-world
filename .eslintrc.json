@@ -5,10 +5,11 @@
     "node": true
   },
   "extends": [
-    "plugin:react/recommended",
-    "plugin:json/recommended",
     "airbnb",
     "airbnb-base",
+    "plugin:react/recommended",
+    "plugin:json/recommended",
+    "plugin:yaml/recommended",
     "plugin:prettier/recommended"
   ],
   "globals": {
@@ -23,6 +24,34 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "plugins": ["react", "@typescript-eslint"],
-  "rules": {}
+  "plugins": ["react", "yaml", "@typescript-eslint"],
+  "rules": {
+    "import/prefer-default-export": 0,
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ]
+  },
+  "settings": {
+    "import/core-modules": ["aws-sdk"],
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+        "moduleDirectory": ["node_modules", "src/"]
+      }
+    }
+  }
 }
