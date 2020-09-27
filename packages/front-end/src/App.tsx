@@ -1,24 +1,32 @@
 import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
+import Lockcept from "./lockcept";
+import Axios from "axios";
+
+const getHttpEndPoints = () => {
+  const httpEndPoints = {
+    dev: "http://localhost:4000/dev",
+    prod: "https://api.lockcept.kr/prod",
+  };
+  const stage = process.env.REACT_APP_STAGE;
+  console.log(stage);
+  if (!stage) return httpEndPoints.dev;
+  switch (stage) {
+    case "prod":
+      return httpEndPoints.prod;
+    default:
+      return httpEndPoints.dev;
+  }
+};
 
 function App() {
+  const instance = Axios.create({
+    baseURL: getHttpEndPoints(),
+  });
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Lockcept instance={instance}></Lockcept>
     </div>
   );
 }
