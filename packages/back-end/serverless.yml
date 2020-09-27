@@ -1,0 +1,85 @@
+service: lockcept-world
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-dynamodb-local
+  - serverless-offline
+  - serverless-domain-manager
+
+frameworkVersion: "2"
+
+custom:
+  customDomain:
+    domainName: "api.lockcept.kr"
+    basePath: ${self:provider.stage}
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+  serverless-offline:
+    useChildProcesses: true
+    httpPort: 4000
+  dynamodb:
+    stages:
+      - dev
+    start:
+      migrate: true
+  tables:
+    lockcept-table: ${self:service}-lockcept-table-${self:provider.stage}
+
+provider:
+  name: aws
+  stage: ${ opt:stage, "dev" }
+  region: ap-northeast-2
+  runtime: nodejs12.x
+  environment:
+    STAGE: ${self:provider.stage}
+    LOCKCEPT_TABLE: ${self:custom.tables.lockcept-table}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "*"
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /
+          method: any
+          cors: true
+  postLockcept:
+    handler: src/handler/lockcept.post
+    events:
+      - http:
+          path: /lockcept/{email}
+          method: get
+          cors: true
+  getLockcept:
+    handler: src/handler/lockcept.get
+    events:
+      - http:
+          path: /lockcept
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    lockceptTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.tables.lockcept-table}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
