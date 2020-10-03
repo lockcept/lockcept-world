@@ -24,6 +24,7 @@ custom:
       migrate: true
   tables:
     lockcept-table: ${self:service}-lockcept-table-${self:provider.stage}
+    user-table: ${self:service}-user-table-${self:provider.stage}
 
 provider:
   name: aws
@@ -33,6 +34,7 @@ provider:
   environment:
     STAGE: ${self:provider.stage}
     LOCKCEPT_TABLE: ${self:custom.tables.lockcept-table}
+    USER_TABLE: ${self:custom.tables.lockcept-table}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -66,6 +68,34 @@ functions:
           path: /lockcept
           method: get
           cors: true
+  createUser:
+    handler: src/handler/user.create
+    events:
+      - http:
+          path: /users
+          method: post
+          cors: true
+  checkUser:
+    handler: src/handler/user.check
+    events:
+      - http:
+          path: /users/{userId}/check
+          method: get
+          cors: true
+  signinUser:
+    handler: src/handler/user.signin
+    events:
+      - http:
+          path: /users/{userId}/signin
+          method: post
+          cors: true
+  updateEmail:
+    handler: src/handler/user.updateEmail
+    events:
+      - http:
+          path: /users/{userId}/updateEmail
+          method: patch
+          cors: true
 
 resources:
   Resources:
@@ -74,6 +104,20 @@ resources:
       DeletionPolicy: Retain
       Properties:
         TableName: ${self:custom.tables.lockcept-table}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    userTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.tables.user-table}
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S

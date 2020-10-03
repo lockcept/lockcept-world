@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "aws-lambda": "^1.0.6",
+    "@lockcept/shared": "link:./../shared",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
