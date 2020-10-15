@@ -34,7 +34,7 @@ provider:
   environment:
     STAGE: ${self:provider.stage}
     LOCKCEPT_TABLE: ${self:custom.tables.lockcept-table}
-    USER_TABLE: ${self:custom.tables.lockcept-table}
+    USER_TABLE: ${self:custom.tables.user-table}
   iamRoleStatements:
     - Effect: Allow
       Action:

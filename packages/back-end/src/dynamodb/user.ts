@@ -2,7 +2,7 @@ import { UserData } from "@lockcept/shared";
 import { config } from "../config";
 import dynamodb from "./dynamodb";
 
-const table = config.table.user;
+const userTable = config.table.user;
 
 class User {
   data: UserData;
@@ -13,7 +13,7 @@ class User {
 
   static checkUserItem = async (userId: string) => {
     const params = {
-      TableName: table,
+      TableName: userTable,
       Key: {
         id: userId,
       },
@@ -27,7 +27,7 @@ class User {
 
   static createUserItem = async (user: UserData) => {
     const params = {
-      TableName: table,
+      TableName: userTable,
       Item: user,
       ConditionExpression: "attribute_not_exists(id)",
     };
@@ -40,7 +40,7 @@ class User {
 
   static getUserItem = async (userId: string) => {
     const params = {
-      TableName: table,
+      TableName: userTable,
       Key: {
         id: userId,
       },
