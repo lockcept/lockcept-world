@@ -26,7 +26,7 @@ const services: service[] = [
     name: `Homework Planner`,
     content: `Design Your Homework`,
     link: `/hwplan`,
-    image: `lockcept.svg`,
+    image: `lockcept.png`,
   },
   {
     id: `comming-soon`,

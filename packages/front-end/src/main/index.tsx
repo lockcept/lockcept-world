@@ -33,6 +33,16 @@ const useStyles = makeStyles((theme) =>
     },
     serviceCard: {
       height: "100%",
+      flexDirection: "column",
+      display: "flex",
+    },
+    serviceMedia: {
+      height: 90,
+      paddingTop: theme.spacing(1),
+      objectFit: "contain",
+    },
+    serviceContent: {
+      flex: "1 0 auto",
     },
   })
 );
@@ -43,7 +53,7 @@ function Main({ instance: _instance }: Props) {
   const serviceItems = services;
   return (
     <>
-      <Box>
+      <Box id="toolbar">
         <AppBar color="primary" position="static">
           <Toolbar>
             <Typography variant="h6" className={classes.title}>
@@ -60,7 +70,7 @@ function Main({ instance: _instance }: Props) {
           </Toolbar>
         </AppBar>
       </Box>
-      <Box m={5}>
+      <Box id="service" m={5}>
         <Container maxWidth="lg">
           <Grid container>
             {serviceItems.map((service) => {
@@ -79,13 +89,13 @@ function Main({ instance: _instance }: Props) {
                     id="services"
                   >
                     <CardMedia
+                      className={classes.serviceMedia}
                       component="img"
                       alt={service.id}
-                      height={60}
                       image={`/img/services/${service.image}`}
                     />
                     <CardHeader title={service.name} />
-                    <CardContent>
+                    <CardContent className={classes.serviceContent}>
                       <Typography color="textPrimary" gutterBottom>
                         {service.content}
                       </Typography>
@@ -105,6 +115,7 @@ function Main({ instance: _instance }: Props) {
           </Grid>
         </Container>
       </Box>
+      <Box id="link" />
     </>
   );
 }
