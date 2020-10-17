@@ -1,4 +1,4 @@
-interface service {
+interface Service {
   id: string;
   name: string;
   content: string;
@@ -6,7 +6,7 @@ interface service {
   image: string;
 }
 
-const services: service[] = [
+const services: Service[] = [
   {
     id: `account`,
     name: `Account`,
@@ -35,6 +35,6 @@ const services: service[] = [
     link: `/`,
     image: `lockcept.svg`,
   },
-] as service[];
+] as Service[];
 
 export { services };
