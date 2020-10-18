@@ -17,6 +17,7 @@ import {
 import { AxiosInstance } from "axios";
 import React from "react";
 import { useHistory } from "react-router-dom";
+import Footer from "./footer";
 import { services } from "./services";
 
 interface Props {
@@ -72,6 +73,9 @@ function Main({ instance: _instance }: Props) {
       </Box>
       <Box id="service" m={5}>
         <Container maxWidth="lg">
+          <Typography variant="h3" align="center">
+            Service
+          </Typography>
           <Grid container>
             {serviceItems.map((service) => {
               return (
@@ -115,7 +119,7 @@ function Main({ instance: _instance }: Props) {
           </Grid>
         </Container>
       </Box>
-      <Box id="link" />
+      <Footer />
     </>
   );
 }
