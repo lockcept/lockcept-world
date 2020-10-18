@@ -26,6 +26,13 @@ const services: Service[] = [
     name: `Homework Planner`,
     content: `Design Your Homework`,
     link: `/hwplan`,
+    image: `lockcept.svg`,
+  },
+  {
+    id: `comming-soon`,
+    name: `comming-soon`,
+    content: `Comming Soon`,
+    link: `/`,
     image: `lockcept.png`,
   },
   {
@@ -33,8 +40,53 @@ const services: Service[] = [
     name: `comming-soon`,
     content: `Comming Soon`,
     link: `/`,
-    image: `lockcept.svg`,
+    image: `lockcept.png`,
+  },
+  {
+    id: `comming-soon`,
+    name: `comming-soon`,
+    content: `Comming Soon`,
+    link: `/`,
+    image: `lockcept.png`,
+  },
+  {
+    id: `comming-soon`,
+    name: `comming-soon`,
+    content: `Comming Soon`,
+    link: `/`,
+    image: `lockcept.png`,
+  },
+  {
+    id: `comming-soon`,
+    name: `comming-soon`,
+    content: `Comming Soon`,
+    link: `/`,
+    image: `lockcept.png`,
   },
 ] as Service[];
 
-export { services };
+const links: Service[] = [
+  {
+    id: `comming-soon`,
+    name: `comming-soon`,
+    content: `Comming Soon`,
+    link: `/`,
+    image: `lockcept.png`,
+  },
+  {
+    id: `comming-soon`,
+    name: `comming-soon`,
+    content: `Comming Soon`,
+    link: `/`,
+    image: `lockcept.png`,
+  },
+  {
+    id: `comming-soon`,
+    name: `comming-soon`,
+    content: `Comming Soon`,
+    link: `/`,
+    image: `lockcept.png`,
+  },
+];
+
+export { services, links };

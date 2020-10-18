@@ -18,7 +18,7 @@ import { AxiosInstance } from "axios";
 import React from "react";
 import { useHistory } from "react-router-dom";
 import Footer from "./footer";
-import { services } from "./services";
+import { links, services } from "./services";
 
 interface Props {
   instance?: AxiosInstance;
@@ -52,6 +52,7 @@ function Main({ instance: _instance }: Props) {
   const classes = useStyles();
   const history = useHistory();
   const serviceItems = services;
+  const linkItems = links;
   return (
     <>
       <Box id="toolbar">
@@ -108,6 +109,54 @@ function Main({ instance: _instance }: Props) {
                       <Button
                         size="small"
                         onClick={() => history.push(service.link)}
+                      >
+                        Learn More
+                      </Button>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+        </Container>
+      </Box>
+      <Box id="link" m={5}>
+        <Container maxWidth="lg">
+          <Typography variant="h3" align="center">
+            Link
+          </Typography>
+          <Grid container>
+            {linkItems.map((link) => {
+              return (
+                <Grid
+                  key={link.id}
+                  className={classes.serviceGrid}
+                  item
+                  xs={12}
+                  sm={6}
+                  md={3}
+                >
+                  <Card
+                    elevation={3}
+                    className={classes.serviceCard}
+                    id="links"
+                  >
+                    <CardMedia
+                      className={classes.serviceMedia}
+                      component="img"
+                      alt={link.id}
+                      image={`/img/services/${link.image}`}
+                    />
+                    <CardHeader title={link.name} />
+                    <CardContent className={classes.serviceContent}>
+                      <Typography color="textPrimary" gutterBottom>
+                        {link.content}
+                      </Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Button
+                        size="small"
+                        onClick={() => history.push(link.link)}
                       >
                         Learn More
                       </Button>
