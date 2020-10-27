@@ -25,6 +25,9 @@ custom:
   tables:
     lockcept-table: ${self:service}-lockcept-table-${self:provider.stage}
     user-table: ${self:service}-user-table-${self:provider.stage}
+    unique-email-table: ${self:service}-unique-email-table-${self:provider.stage}
+    unique-alias-table: ${self:service}-unique-alias-table-${self:provider.stage}
+    account-table: ${self:service}-account-table-${self:provider.stage}
 
 provider:
   name: aws
@@ -33,8 +36,11 @@ provider:
   runtime: nodejs12.x
   environment:
     STAGE: ${self:provider.stage}
-    LOCKCEPT_TABLE: ${self:custom.tables.lockcept-table}
+    LOCKCEPT_TABLE: ${self:custom.tables.lockcept-table
     USER_TABLE: ${self:custom.tables.user-table}
+    UNIQUE_EMAIL_TABLE: ${self:custom.tables.unique-email-table}}
+    UNIQUE_ALIAS_TABLE: ${self:custom.tables.unique-alias-table}}
+    ACCOUNT_TABLE: ${self:custom.tables.account-table}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -47,13 +53,6 @@ provider:
       Resource: "*"
 
 functions:
-  hello:
-    handler: handler.hello
-    events:
-      - http:
-          path: /
-          method: any
-          cors: true
   postLockcept:
     handler: src/handler/lockcept.post
     events:
@@ -119,10 +118,70 @@ resources:
       Properties:
         TableName: ${self:custom.tables.user-table}
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: uuid
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: uuid
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    UniqueEmailTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.tables.unique-email-table}
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: UuidIndex
+            KeySchema:
+              - AttributeName: uuid
+                KeyType: HASH
+            Projection:
+              ProjectionType: KEYS_ONLY
+    UniqueAliasTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.tables.unique-alias-table}
+        AttributeDefinitions:
+          - AttributeName: alias
+            AttributeType: S
+          - AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: alias
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: UuidIndex
+            KeySchema:
+              - AttributeName: uuid
+                KeyType: HASH
+            Projection:
+              ProjectionType: KEYS_ONLY
+    accountTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.tables.account-table}
+        AttributeDefinitions:
+          - AttributeName: uuid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uuid
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
