@@ -1,8 +1,17 @@
 export interface UserData {
-  id: string;
+  uuid: string;
+  email: string;
   password: string;
-  nickname: string;
-  email?: string;
+  alias: string;
+}
+
+export interface UniqueAliasData {
+  alias: string;
+  uuid: string;
+}
+
+export interface AccountData {
+  uuid: string;
   site?: string;
   comment?: string;
 }
