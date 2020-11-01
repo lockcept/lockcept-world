@@ -1,14 +1,6 @@
 import { createServer, proxy } from "aws-serverless-express";
 import { APIGatewayProxyHandler } from "aws-lambda";
-import express from "express";
-
-const app = express();
-
-app.get("/", (req, res) => {
-  res.json({
-    message: "hello lockcept world!",
-  });
-});
+import app from "./app";
 
 const server = createServer(app);
 
