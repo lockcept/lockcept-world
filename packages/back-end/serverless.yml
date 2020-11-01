@@ -149,6 +149,9 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: KEYS_ONLY
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
     UniqueAliasTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
@@ -172,6 +175,9 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: KEYS_ONLY
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
     accountTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
