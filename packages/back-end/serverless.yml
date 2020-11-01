@@ -53,48 +53,15 @@ provider:
       Resource: "*"
 
 functions:
-  postLockcept:
-    handler: src/handler/lockcept.post
+  lockcept:
+    handler: src/handler/index.handler
     events:
       - http:
-          path: /lockcept/{email}
-          method: get
-          cors: true
-  getLockcept:
-    handler: src/handler/lockcept.get
-    events:
+          path: /
+          method: ANY
       - http:
-          path: /lockcept
-          method: get
-          cors: true
-  createUser:
-    handler: src/handler/user.create
-    events:
-      - http:
-          path: /users
-          method: post
-          cors: true
-  checkUser:
-    handler: src/handler/user.check
-    events:
-      - http:
-          path: /users/{userId}/check
-          method: get
-          cors: true
-  signinUser:
-    handler: src/handler/user.signin
-    events:
-      - http:
-          path: /users/{userId}/signin
-          method: post
-          cors: true
-  updateEmail:
-    handler: src/handler/user.updateEmail
-    events:
-      - http:
-          path: /users/{userId}/updateEmail
-          method: patch
-          cors: true
+          path: /{proxy+}
+          method: ANY
 
 resources:
   Resources:
