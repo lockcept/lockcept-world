@@ -1,14 +1,25 @@
 import express from "express";
 import cors from "cors";
-import awsServerlessExpressMiddleware from "aws-serverless-express/middleware";
+import bodyParser from "body-parser";
 
 const app = express();
 app.use(cors());
-app.use(awsServerlessExpressMiddleware.eventContext());
+
+app.use(
+  bodyParser.json({
+    limit: "50mb",
+  })
+);
 
 app.get("/", (req, res) => {
   res.json({
     message: "hello lockcept world",
+  });
+});
+
+app.get("/lockcept", (req, res) => {
+  res.json({
+    message: "hello lockcept world!",
   });
 });
 

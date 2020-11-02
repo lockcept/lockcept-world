@@ -1,9 +1,9 @@
-import { createServer, proxy } from "aws-serverless-express";
-import { APIGatewayProxyHandler } from "aws-lambda";
+import serverless from "serverless-http";
+import { config } from "../config";
 import app from "./app";
 
-const server = createServer(app);
+const { stage } = config.app;
 
-export const handler: APIGatewayProxyHandler = (event, context) => {
-  proxy(server, event, context);
-};
+export const handler = serverless(app, {
+  basePath: `/${stage}`,
+});
