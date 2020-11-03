@@ -2,11 +2,11 @@ export interface UserData {
   uuid: string;
   email: string;
   password: string;
-  alias: string;
+  userName: string;
 }
 
-export interface UniqueAliasData {
-  alias: string;
+export interface UniqueUserNameData {
+  userName: string;
   uuid: string;
 }
 
