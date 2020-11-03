@@ -4,7 +4,7 @@ export const config = {
     lockcept: process.env.LOCKCEPT_TABLE || "",
     user: process.env.USER_TABLE || "",
     uniqueEmail: process.env.UNIQUE_EMAIL_TABLE || "",
-    uniqueAlias: process.env.UNIQUE_ALIAS_TABLE || "",
+    uniqueUserName: process.env.UNIQUE_USER_NAME_TABLE || "",
     account: process.env.ACCOUNT_TABLE || "",
   },
 };

@@ -31,7 +31,7 @@ custom:
     lockcept-table: ${self:service}-lockcept-table-${self:provider.stage}
     user-table: ${self:service}-user-table-${self:provider.stage}
     unique-email-table: ${self:service}-unique-email-table-${self:provider.stage}
-    unique-alias-table: ${self:service}-unique-alias-table-${self:provider.stage}
+    unique-user-name-table: ${self:service}-unique-user-name-table-${self:provider.stage}
     account-table: ${self:service}-account-table-${self:provider.stage}
 
 provider:
@@ -44,7 +44,7 @@ provider:
     LOCKCEPT_TABLE: ${self:custom.tables.lockcept-table
     USER_TABLE: ${self:custom.tables.user-table}
     UNIQUE_EMAIL_TABLE: ${self:custom.tables.unique-email-table}}
-    UNIQUE_ALIAS_TABLE: ${self:custom.tables.unique-alias-table}}
+    UNIQUE_USER_NAME_TABLE: ${self:custom.tables.unique-user-name-table}}
     ACCOUNT_TABLE: ${self:custom.tables.account-table}
   iamRoleStatements:
     - Effect: Allow
@@ -124,18 +124,18 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-    UniqueAliasTable:
+    UniqueUserNameTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
-        TableName: ${self:custom.tables.unique-alias-table}
+        TableName: ${self:custom.tables.unique-user-name-table}
         AttributeDefinitions:
-          - AttributeName: alias
+          - AttributeName: userName
             AttributeType: S
           - AttributeName: uuid
             AttributeType: S
         KeySchema:
-          - AttributeName: alias
+          - AttributeName: userName
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
