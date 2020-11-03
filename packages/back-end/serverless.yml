@@ -1,8 +1,8 @@
 service: lockcept-world
 
 plugins:
-  - serverless-plugin-typescript
   - serverless-dynamodb-local
+  - serverless-webpack
   - serverless-offline
   - serverless-domain-manager
 
@@ -23,6 +23,10 @@ custom:
       - dev
     start:
       migrate: true
+  custom:
+    webpack:
+      includeModules: true
+      keepOutputDirectory: true
   tables:
     lockcept-table: ${self:service}-lockcept-table-${self:provider.stage}
     user-table: ${self:service}-user-table-${self:provider.stage}
