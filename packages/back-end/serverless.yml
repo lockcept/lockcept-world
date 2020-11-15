@@ -43,8 +43,8 @@ provider:
     STAGE: ${self:provider.stage}
     LOCKCEPT_TABLE: ${self:custom.tables.lockcept-table
     USER_TABLE: ${self:custom.tables.user-table}
-    UNIQUE_EMAIL_TABLE: ${self:custom.tables.unique-email-table}}
-    UNIQUE_USER_NAME_TABLE: ${self:custom.tables.unique-user-name-table}}
+    UNIQUE_EMAIL_TABLE: ${self:custom.tables.unique-email-table}
+    UNIQUE_USER_NAME_TABLE: ${self:custom.tables.unique-user-name-table}
     ACCOUNT_TABLE: ${self:custom.tables.account-table}
   iamRoleStatements:
     - Effect: Allow
@@ -90,10 +90,10 @@ resources:
       Properties:
         TableName: ${self:custom.tables.user-table}
         AttributeDefinitions:
-          - AttributeName: uuid
+          - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: uuid
+          - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
@@ -106,7 +106,7 @@ resources:
         AttributeDefinitions:
           - AttributeName: email
             AttributeType: S
-          - AttributeName: uuid
+          - AttributeName: id
             AttributeType: S
         KeySchema:
           - AttributeName: email
@@ -115,9 +115,9 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
-          - IndexName: UuidIndex
+          - IndexName: IdIndex
             KeySchema:
-              - AttributeName: uuid
+              - AttributeName: id
                 KeyType: HASH
             Projection:
               ProjectionType: KEYS_ONLY
@@ -132,7 +132,7 @@ resources:
         AttributeDefinitions:
           - AttributeName: userName
             AttributeType: S
-          - AttributeName: uuid
+          - AttributeName: id
             AttributeType: S
         KeySchema:
           - AttributeName: userName
@@ -141,9 +141,9 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
-          - IndexName: UuidIndex
+          - IndexName: IdIndex
             KeySchema:
-              - AttributeName: uuid
+              - AttributeName: id
                 KeyType: HASH
             Projection:
               ProjectionType: KEYS_ONLY
@@ -156,10 +156,10 @@ resources:
       Properties:
         TableName: ${self:custom.tables.account-table}
         AttributeDefinitions:
-          - AttributeName: uuid
+          - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: uuid
+          - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1

@@ -1,8 +1,14 @@
 import { UserData } from "@lockcept/shared";
+import { map } from "lodash";
+import { nanoid } from "nanoid";
+import validator from "validator";
 import { config } from "../config";
+import { errorLogger } from "../logger";
 import dynamodb from "./dynamodb";
 
 const userTable = config.table.user;
+const uniqueEmailTable = config.table.uniqueEmail;
+const uniqueUserNameTable = config.table.uniqueUserName;
 
 class User {
   data: UserData;
@@ -11,49 +17,195 @@ class User {
     this.data = data;
   }
 
-  static checkUserItem = async (userId: string) => {
-    const params = {
-      TableName: userTable,
-      Key: {
-        id: userId,
-      },
-    };
-
-    const dynamodbOutput = await dynamodb.get(params).promise();
-    if (dynamodbOutput.Item) return true;
-
-    return false;
+  static getItems = async () => {
+    const { Items: userItems } = await dynamodb
+      .scan({
+        TableName: userTable,
+      })
+      .promise();
+    return map(userItems, (user) => {
+      return new User(user as UserData);
+    });
   };
 
-  static createUserItem = async (user: UserData) => {
-    const params = {
-      TableName: userTable,
-      Item: user,
-      ConditionExpression: "attribute_not_exists(id)",
-    };
-    // eslint-disable-next-line no-console
-    console.log(params);
-
-    await dynamodb.put(params).promise();
-    return true;
+  static getUniqueEmailItems = async () => {
+    const { Items: uniqueEmailItems } = await dynamodb
+      .scan({
+        TableName: uniqueEmailTable,
+      })
+      .promise();
+    return map(uniqueEmailItems, (uniqueEmail) => {
+      return JSON.stringify(uniqueEmail);
+    });
   };
 
-  static getUserItem = async (userId: string) => {
-    const params = {
-      TableName: userTable,
-      Key: {
-        id: userId,
-      },
+  static createUserItem = async (data: Omit<UserData, "id">) => {
+    const id = nanoid();
+    const { email, password, userName } = data;
+
+    // check data validation
+    if (!email || !password || !userName) {
+      errorLogger("Invalid Data at createUserItem", data);
+      throw Error();
+    }
+    if (!validator.isEmail(email)) {
+      errorLogger("Invalid Email at createUserItem", { email });
+      throw Error();
+    }
+    if (!validator.isAlphanumeric(userName)) {
+      errorLogger("Invalid UserName at createUserItem", { userName });
+      throw Error();
+    }
+
+    const userData = { ...data, id };
+
+    // check unique validation
+    try {
+      const emailData = {
+        email,
+        id,
+      };
+      const userNameData = {
+        userName,
+        id,
+      };
+      const paramsEmail = {
+        TableName: uniqueEmailTable,
+        Item: emailData,
+        ConditionExpression: "attribute_not_exists(email)",
+      };
+      const paramsUserName = {
+        TableName: uniqueUserNameTable,
+        Item: userNameData,
+        ConditionExpression: "attribute_not_exists(userName)",
+      };
+      await dynamodb
+        .transactWrite({
+          TransactItems: [
+            {
+              Put: paramsEmail,
+            },
+            {
+              Put: paramsUserName,
+            },
+          ],
+        })
+        .promise();
+    } catch (e) {
+      errorLogger("Failed to add unique data at createUserItem", userData);
+      errorLogger(e);
+      throw e;
+    }
+
+    // add new user
+    try {
+      await dynamodb
+        .put({
+          TableName: userTable,
+          Item: userData,
+          ConditionExpression: "attribute_not_exists(id)",
+        })
+        .promise();
+    } catch (e) {
+      if (e.code === "ConditionalCheckFailedException") {
+        errorLogger("User Already Exist at createUserItem", userData);
+        throw Error();
+      }
+      throw e;
+    }
+  };
+
+  static setEmail = async (id: string, email: string) => {
+    const getPrevEmail = async (): Promise<string | null> => {
+      try {
+        const { Items: emailPrevItem } = await dynamodb
+          .scan({
+            TableName: uniqueEmailTable,
+            IndexName: "IdIndex",
+            AttributesToGet: ["email"],
+            ScanFilter: {
+              id: {
+                ComparisonOperator: "EQ",
+                AttributeValueList: [id],
+              },
+            },
+          })
+          .promise();
+
+        if (!emailPrevItem) throw Error();
+        // eslint-disable-next-line no-console
+        console.log(emailPrevItem);
+        const prevEmail = emailPrevItem[0].email;
+        if (!prevEmail) throw Error();
+
+        return prevEmail;
+      } catch (e) {
+        errorLogger("Failed to get Prev Email at setEmail", { id, email });
+        return null;
+      }
     };
+
+    const prevEmail = await getPrevEmail();
+    if (!prevEmail) {
+      throw Error();
+    }
+
+    if (!validator.isEmail(email)) {
+      errorLogger("Invalid Email at setEmail", { email });
+      return;
+    }
+
+    // register new email
+    const emailItem = { id, email };
 
     try {
-      const dynamodbOutput = await dynamodb.get(params).promise();
-      if (dynamodbOutput.Item) {
-        return new User(dynamodbOutput.Item as UserData);
-      }
-      return null;
+      const paramsPutEmail = {
+        TableName: uniqueEmailTable,
+        Item: emailItem,
+        ConditionExpression: "attribute_not_exists(id)",
+      };
+      const paramsUpdateUser = {
+        TableName: userTable,
+        Key: {
+          id,
+        },
+        UpdateExpression: "set #a = :x",
+        ExpressionAttributeNames: { "#a": "email" },
+        ExpressionAttributeValues: { ":x": email },
+      };
+      await dynamodb
+        .transactWrite({
+          TransactItems: [
+            {
+              Put: paramsPutEmail,
+            },
+            {
+              Update: paramsUpdateUser,
+            },
+          ],
+        })
+        .promise();
     } catch (e) {
-      throw Error("Failed to get user");
+      if (e.code === "ConditionalCheckFailedException") {
+        errorLogger("Email Already Exist at setEmail", emailItem);
+        throw Error();
+      }
+      errorLogger(e);
+      throw e;
+    }
+
+    // delete prev email
+    try {
+      await dynamodb
+        .delete({
+          TableName: uniqueEmailTable,
+          Key: {
+            email: prevEmail,
+          },
+        })
+        .promise();
+    } catch (e) {
+      errorLogger("Failed to delete prev email at setEmail", { id });
     }
   };
 }
