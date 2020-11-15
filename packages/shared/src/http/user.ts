@@ -1,7 +1,7 @@
 import { UserData } from "../tables/user";
 
 export interface CreateUserRequest {
-  userData: UserData;
+  userData: Omit<UserData, "id">;
 }
 
 export interface CreateUserResponse {

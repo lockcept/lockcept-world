@@ -1,5 +1,5 @@
 export interface UserData {
-  uuid: string;
+  id: string;
   email: string;
   password: string;
   userName: string;
@@ -7,11 +7,11 @@ export interface UserData {
 
 export interface UniqueUserNameData {
   userName: string;
-  uuid: string;
+  id: string;
 }
 
 export interface AccountData {
-  uuid: string;
+  id: string;
   site?: string;
   comment?: string;
 }
