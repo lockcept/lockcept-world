@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../../dynamodb/user";
+import { errorLogger } from "../../logger";
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.get("/user", async (req, res) => {
       message2: uniqueEmailItems,
     });
   } catch (e) {
+    errorLogger(e);
     res.json({});
   }
 });
@@ -31,6 +33,7 @@ router.get("/user/create", async (req, res) => {
     });
     res.json({ message: "Good!" });
   } catch (e) {
+    errorLogger(e);
     res.json({ message: "Failed to create" });
   }
 });
@@ -41,6 +44,7 @@ router.get("/user/set-email/:id/:email", async (req, res) => {
     await User.setEmail(id, email);
     res.json({ message: "Good!" });
   } catch (e) {
+    errorLogger(e);
     res.json({ message: "Failed to create" });
   }
 });
@@ -51,6 +55,7 @@ router.get("/user/set-user-name/:id/:userName", async (req, res) => {
     await User.setUserName(id, userName);
     res.json({ message: "Good!" });
   } catch (e) {
+    errorLogger(e);
     res.json({ message: "Failed to create" });
   }
 });
@@ -61,6 +66,7 @@ router.get("/user/set-password/:id/:password", async (req, res) => {
     await User.setPassword(id, password);
     res.json({ message: "Good!" });
   } catch (e) {
+    errorLogger(e);
     res.json({ message: "Failed to create" });
   }
 });

@@ -141,7 +141,7 @@ class User {
         return prevEmail;
       } catch (e) {
         errorLogger("Failed to get prev email at setEmail", { id, email });
-        return null;
+        throw e;
       }
     };
 
@@ -187,7 +187,6 @@ class User {
         .promise();
     } catch (e) {
       errorLogger("Failed to register new email at setEmail", emailItem);
-      errorLogger(e);
       throw e;
     }
 
@@ -203,6 +202,7 @@ class User {
         .promise();
     } catch (e) {
       errorLogger("Failed to delete prev email at setEmail", { id });
+      throw e;
     }
   };
 
@@ -233,7 +233,7 @@ class User {
           id,
           userName,
         });
-        return null;
+        throw e;
       }
     };
 
@@ -244,7 +244,7 @@ class User {
 
     if (!validator.isAlphanumeric(userName)) {
       errorLogger("Invalid userName at setUserName", { userName });
-      return;
+      throw Error();
     }
 
     // register new userName
@@ -282,7 +282,6 @@ class User {
         "Failed to register new userName at setUserName",
         userNameItem
       );
-      errorLogger(e);
       throw e;
     }
 
@@ -298,6 +297,7 @@ class User {
         .promise();
     } catch (e) {
       errorLogger("Failed to delete prev userName at setUserName", { id });
+      throw e;
     }
   };
 
@@ -322,7 +322,6 @@ class User {
         errorLogger("User id does not exist at setPassword", { id });
         throw Error();
       }
-      errorLogger(e);
       throw e;
     }
   };
