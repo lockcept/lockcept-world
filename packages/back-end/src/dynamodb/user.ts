@@ -108,7 +108,7 @@ class User {
         .promise();
     } catch (e) {
       if (e.code === "ConditionalCheckFailedException") {
-        errorLogger("User Already Exist at createUserItem", userData);
+        errorLogger("User already exist at createUserItem", userData);
         throw Error();
       }
       throw e;
@@ -140,7 +140,7 @@ class User {
 
         return prevEmail;
       } catch (e) {
-        errorLogger("Failed to get Prev Email at setEmail", { id, email });
+        errorLogger("Failed to get prev email at setEmail", { id, email });
         return null;
       }
     };
@@ -151,7 +151,7 @@ class User {
     }
 
     if (!validator.isEmail(email)) {
-      errorLogger("Invalid Email at setEmail", { email });
+      errorLogger("Invalid email at setEmail", { email });
       return;
     }
 
@@ -186,10 +186,7 @@ class User {
         })
         .promise();
     } catch (e) {
-      if (e.code === "ConditionalCheckFailedException") {
-        errorLogger("Email Already Exist at setEmail", emailItem);
-        throw Error();
-      }
+      errorLogger("Failed to register new email at setEmail", emailItem);
       errorLogger(e);
       throw e;
     }
@@ -206,6 +203,127 @@ class User {
         .promise();
     } catch (e) {
       errorLogger("Failed to delete prev email at setEmail", { id });
+    }
+  };
+
+  static setUserName = async (id: string, userName: string) => {
+    const getPrevUserName = async (): Promise<string | null> => {
+      try {
+        const { Items: userNamePrevItem } = await dynamodb
+          .scan({
+            TableName: uniqueUserNameTable,
+            IndexName: "IdIndex",
+            AttributesToGet: ["userName"],
+            ScanFilter: {
+              id: {
+                ComparisonOperator: "EQ",
+                AttributeValueList: [id],
+              },
+            },
+          })
+          .promise();
+
+        if (!userNamePrevItem) throw Error();
+        const prevUserName = userNamePrevItem[0].userName;
+        if (!prevUserName) throw Error();
+
+        return prevUserName;
+      } catch (e) {
+        errorLogger("Failed to get Prev UserName at setUserName", {
+          id,
+          userName,
+        });
+        return null;
+      }
+    };
+
+    const prevUserName = await getPrevUserName();
+    if (!prevUserName) {
+      throw Error();
+    }
+
+    if (!validator.isAlphanumeric(userName)) {
+      errorLogger("Invalid userName at setUserName", { userName });
+      return;
+    }
+
+    // register new userName
+    const userNameItem = { id, userName };
+
+    try {
+      const paramsPutUserName = {
+        TableName: uniqueUserNameTable,
+        Item: userNameItem,
+        ConditionExpression: "attribute_not_exists(id)",
+      };
+      const paramsUpdateUser = {
+        TableName: userTable,
+        Key: {
+          id,
+        },
+        UpdateExpression: "set #a = :x",
+        ExpressionAttributeNames: { "#a": "userName" },
+        ExpressionAttributeValues: { ":x": userName },
+      };
+      await dynamodb
+        .transactWrite({
+          TransactItems: [
+            {
+              Put: paramsPutUserName,
+            },
+            {
+              Update: paramsUpdateUser,
+            },
+          ],
+        })
+        .promise();
+    } catch (e) {
+      errorLogger(
+        "Failed to register new userName at setUserName",
+        userNameItem
+      );
+      errorLogger(e);
+      throw e;
+    }
+
+    // delete prev userName
+    try {
+      await dynamodb
+        .delete({
+          TableName: uniqueUserNameTable,
+          Key: {
+            userName: prevUserName,
+          },
+        })
+        .promise();
+    } catch (e) {
+      errorLogger("Failed to delete prev userName at setUserName", { id });
+    }
+  };
+
+  static setPassword = async (id: string, password: string) => {
+    // register new userName
+
+    try {
+      await dynamodb
+        .update({
+          TableName: userTable,
+          Key: {
+            id,
+          },
+          UpdateExpression: "set #a = :x",
+          ExpressionAttributeNames: { "#a": "password" },
+          ExpressionAttributeValues: { ":x": password },
+          ConditionExpression: "attribute_exists(id)",
+        })
+        .promise();
+    } catch (e) {
+      if (e.code === "ConditionalCheckFailedException") {
+        errorLogger("User id does not exist at setPassword", { id });
+        throw Error();
+      }
+      errorLogger(e);
+      throw e;
     }
   };
 }
