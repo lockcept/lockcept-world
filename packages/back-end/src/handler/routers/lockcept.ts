@@ -35,10 +35,30 @@ router.get("/user/create", async (req, res) => {
   }
 });
 
-router.get("/user/set-email/:id", async (req, res) => {
-  const { id } = req.params;
+router.get("/user/set-email/:id/:email", async (req, res) => {
+  const { id, email } = req.params;
   try {
-    await User.setEmail(id, "lockcept2@gmail.com");
+    await User.setEmail(id, email);
+    res.json({ message: "Good!" });
+  } catch (e) {
+    res.json({ message: "Failed to create" });
+  }
+});
+
+router.get("/user/set-user-name/:id/:userName", async (req, res) => {
+  const { id, userName } = req.params;
+  try {
+    await User.setUserName(id, userName);
+    res.json({ message: "Good!" });
+  } catch (e) {
+    res.json({ message: "Failed to create" });
+  }
+});
+
+router.get("/user/set-password/:id/:password", async (req, res) => {
+  const { id, password } = req.params;
+  try {
+    await User.setPassword(id, password);
     res.json({ message: "Good!" });
   } catch (e) {
     res.json({ message: "Failed to create" });
