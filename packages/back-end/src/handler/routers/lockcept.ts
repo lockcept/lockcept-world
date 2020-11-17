@@ -12,8 +12,8 @@ router.get("/", (req, res) => {
 
 router.get("/user", async (req, res) => {
   try {
-    const userItems = await User.getItems();
-    const uniqueEmailItems = await User.getUniqueEmailItems();
+    const userItems = await User.getAll();
+    const uniqueEmailItems = await User.getAllUniqueEmails();
     res.json({
       message: userItems,
       message2: uniqueEmailItems,

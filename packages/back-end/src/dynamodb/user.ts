@@ -17,7 +17,7 @@ class User {
     this.data = data;
   }
 
-  static getItems = async () => {
+  static getAll = async (): Promise<User[]> => {
     const { Items: userItems } = await dynamodb
       .scan({
         TableName: userTable,
@@ -28,7 +28,7 @@ class User {
     });
   };
 
-  static getUniqueEmailItems = async () => {
+  static getAllUniqueEmails = async (): Promise<string[]> => {
     const { Items: uniqueEmailItems } = await dynamodb
       .scan({
         TableName: uniqueEmailTable,
@@ -39,7 +39,32 @@ class User {
     });
   };
 
-  static createUserItem = async (data: Omit<UserData, "id">) => {
+  static findOneByEmail = async (email: string): Promise<User> => {
+    try {
+      const { Items: userItems } = await dynamodb
+        .scan({
+          TableName: userTable,
+          IndexName: "EmailIndex",
+          ScanFilter: {
+            email: {
+              ComparisonOperator: "EQ",
+              AttributeValueList: [email],
+            },
+          },
+        })
+        .promise();
+
+      if (!userItems) throw Error();
+      const userData = userItems[0] as UserData;
+      if (!userData) throw Error();
+      return new User(userData);
+    } catch (e) {
+      errorLogger("Failed at findOneByEmail", { email });
+      throw e;
+    }
+  };
+
+  static createUserItem = async (data: Omit<UserData, "id">): Promise<void> => {
     const id = nanoid();
     const { email, password, userName } = data;
 
@@ -115,7 +140,7 @@ class User {
     }
   };
 
-  static setEmail = async (id: string, email: string) => {
+  static setEmail = async (id: string, email: string): Promise<void> => {
     const getPrevEmail = async (): Promise<string | null> => {
       try {
         const { Items: emailPrevItem } = await dynamodb
@@ -133,8 +158,6 @@ class User {
           .promise();
 
         if (!emailPrevItem) throw Error();
-        // eslint-disable-next-line no-console
-        console.log(emailPrevItem);
         const prevEmail = emailPrevItem[0].email;
         if (!prevEmail) throw Error();
 
@@ -206,7 +229,7 @@ class User {
     }
   };
 
-  static setUserName = async (id: string, userName: string) => {
+  static setUserName = async (id: string, userName: string): Promise<void> => {
     const getPrevUserName = async (): Promise<string | null> => {
       try {
         const { Items: userNamePrevItem } = await dynamodb
@@ -301,7 +324,7 @@ class User {
     }
   };
 
-  static setPassword = async (id: string, password: string) => {
+  static setPassword = async (id: string, password: string): Promise<void> => {
     // register new userName
 
     try {
