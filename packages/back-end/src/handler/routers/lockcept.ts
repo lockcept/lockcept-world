@@ -1,13 +1,14 @@
 import express from "express";
 import User from "../../dynamodb/user";
-import { compareHash, hash } from "../../helper";
+import { hash } from "../../helper";
 import { errorLogger } from "../../logger";
 
 const router = express.Router();
 
 router.get("/", (req, res) => {
+  const user = req.user as User;
   res.json({
-    message: "hello lockcept world",
+    message: `hello lockcept world ${JSON.stringify(user.data, null, 2)}`,
   });
 });
 
