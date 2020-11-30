@@ -26,4 +26,4 @@ signupRouter.post("/signup/google", (req, res) => {
   });
 });
 
-export { signupRouter };
+export default signupRouter;

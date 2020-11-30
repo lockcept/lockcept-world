@@ -76,4 +76,4 @@ signinRouter.post("/auth/signin/google", (req, res) => {
   });
 });
 
-export { signinRouter };
+export default signinRouter;

@@ -1,6 +1,6 @@
 import express from "express";
-import { signinRouter } from "./signin";
-import { signupRouter } from "./signup";
+import signinRouter from "./signin";
+import signupRouter from "./signup";
 
 const router = express.Router();
 
