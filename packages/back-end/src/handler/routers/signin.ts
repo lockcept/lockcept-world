@@ -2,6 +2,7 @@ import express from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import { Strategy as LocalStrategy } from "passport-local";
+import { omit } from "lodash";
 import User from "../../dynamodb/user";
 import { compareHash } from "../../helper";
 import { errorLogger } from "../../logger";
@@ -57,7 +58,9 @@ signinRouter.post("/auth/signin/local", (req, res) => {
         if (e) {
           return res.send(e);
         }
-        const token = jwt.sign(user.data, jwtKey, { expiresIn: "1d" });
+        const token = jwt.sign(omit(user.data, "password"), jwtKey, {
+          expiresIn: "1d",
+        });
         return res.json({ token });
       });
     }
