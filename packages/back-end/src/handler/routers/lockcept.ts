@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../../dynamodb/user";
+import { compareHash, hash } from "../../helper";
 import { errorLogger } from "../../logger";
 
 const router = express.Router();
@@ -26,9 +27,10 @@ router.get("/user", async (req, res) => {
 
 router.get("/user/create", async (req, res) => {
   try {
-    await User.createUserItem({
+    const hashPassword = await hash("lockcept");
+    await User.create({
       email: "lockcept@gmail.com",
-      password: "lockcept",
+      password: hashPassword,
       userName: "lockcept",
     });
     res.json({ message: "Good!" });
@@ -68,6 +70,18 @@ router.get("/user/set-password/:id/:password", async (req, res) => {
   } catch (e) {
     errorLogger(e);
     res.json({ message: "Failed to create" });
+  }
+});
+
+router.post("/user/check-password", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    if (!email || !password) throw Error();
+    const compared = await User.comparePassword(email, password);
+    res.json({ message: compared });
+  } catch (e) {
+    errorLogger(e);
+    res.json({ message: "Failed" });
   }
 });
 
