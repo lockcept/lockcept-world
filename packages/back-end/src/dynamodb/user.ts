@@ -1,8 +1,9 @@
 import { UserData } from "@lockcept/shared";
-import { map } from "lodash";
+import { isEmpty, map } from "lodash";
 import { nanoid } from "nanoid";
 import validator from "validator";
 import { config } from "../config";
+import { compareHash } from "../helper";
 import { errorLogger } from "../logger";
 import dynamodb from "./dynamodb";
 
@@ -39,13 +40,27 @@ class User {
     });
   };
 
-  static findOneByEmail = async (email: string): Promise<User> => {
+  static comparePassword = async (
+    email: string,
+    password: string
+  ): Promise<boolean> => {
+    try {
+      const user = await User.findOneByEmail(email);
+      if (!user) throw Error();
+      return compareHash(password, user.data.password);
+    } catch (e) {
+      errorLogger("Failed at comparePassword", { email, password });
+      throw e;
+    }
+  };
+
+  static findOneByEmail = async (email: string): Promise<User | null> => {
     try {
       const { Items: userItems } = await dynamodb
-        .scan({
+        .query({
           TableName: userTable,
           IndexName: "EmailIndex",
-          ScanFilter: {
+          KeyConditions: {
             email: {
               ComparisonOperator: "EQ",
               AttributeValueList: [email],
@@ -53,6 +68,8 @@ class User {
           },
         })
         .promise();
+
+      if (isEmpty(userItems)) return null;
 
       if (!userItems) throw Error();
       const userData = userItems[0] as UserData;
@@ -64,7 +81,7 @@ class User {
     }
   };
 
-  static createUserItem = async (data: Omit<UserData, "id">): Promise<void> => {
+  static create = async (data: Omit<UserData, "id">): Promise<void> => {
     const id = nanoid();
     const { email, password, userName } = data;
 
@@ -118,7 +135,6 @@ class User {
         .promise();
     } catch (e) {
       errorLogger("Failed to add unique data at createUserItem", userData);
-      errorLogger(e);
       throw e;
     }
 

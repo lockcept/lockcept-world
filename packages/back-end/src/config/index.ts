@@ -7,4 +7,7 @@ export const config = {
     uniqueUserName: process.env.UNIQUE_USER_NAME_TABLE || "",
     account: process.env.ACCOUNT_TABLE || "",
   },
+  key: {
+    JWT_USER: "BPvwjfOhgllockcept",
+  },
 };
