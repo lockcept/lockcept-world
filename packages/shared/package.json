@@ -5,5 +5,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsc -w"
+  },
+  "dependencies": {
+    "@types/validator": "^13.1.1",
+    "validator": "^13.5.1"
   }
 }

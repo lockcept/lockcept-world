@@ -16,8 +16,7 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "serverless-http": "^2.6.0",
-    "validator": "^13.1.17"
+    "serverless-http": "^2.6.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.62",
@@ -29,7 +28,6 @@
     "@types/passport-jwt": "^3.0.3",
     "@types/passport-local": "^1.0.33",
     "@types/uuid": "^8.3.0",
-    "@types/validator": "^13.1.0",
     "serverless": "^2.1.0",
     "serverless-domain-manager": "^5.0.0",
     "serverless-dynamodb-local": "^0.2.39",

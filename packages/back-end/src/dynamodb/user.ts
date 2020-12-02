@@ -1,7 +1,11 @@
-import { UserData } from "@lockcept/shared";
+import {
+  UserData,
+  validateEmail,
+  validatePassword,
+  validateUserName,
+} from "@lockcept/shared";
 import { isEmpty, map } from "lodash";
 import { nanoid } from "nanoid";
-import validator from "validator";
 import { config } from "../config";
 import { compareHash, hash } from "../helper";
 import { errorLogger } from "../logger";
@@ -78,15 +82,17 @@ class User {
     const { email, password, userName } = data;
 
     // check data validation
-    if (!email || !password || !userName) {
-      errorLogger("Invalid Data at createUserItem", data);
-      throw Error();
-    }
-    if (!validator.isEmail(email)) {
+
+    if (!validateEmail(email)) {
       errorLogger("Invalid Email at createUserItem", { email });
       throw Error();
     }
-    if (!validator.isAlphanumeric(userName)) {
+
+    if (!validatePassword(password)) {
+      errorLogger("Invalid Password at createUserItem", { password });
+      throw Error();
+    }
+    if (!validateUserName(userName)) {
       errorLogger("Invalid UserName at createUserItem", { userName });
       throw Error();
     }
@@ -181,7 +187,7 @@ class User {
       throw Error();
     }
 
-    if (!validator.isEmail(email)) {
+    if (!validateEmail(email)) {
       errorLogger("Invalid email at setEmail", { email });
       return;
     }
@@ -271,7 +277,7 @@ class User {
       throw Error();
     }
 
-    if (!validator.isAlphanumeric(userName)) {
+    if (!validateUserName(userName)) {
       errorLogger("Invalid userName at setUserName", { userName });
       throw Error();
     }
