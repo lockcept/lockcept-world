@@ -3,9 +3,9 @@ import { isEmpty, map } from "lodash";
 import { nanoid } from "nanoid";
 import validator from "validator";
 import { config } from "../config";
-import { compareHash } from "../helper";
+import { compareHash, hash } from "../helper";
 import { errorLogger } from "../logger";
-import dynamodb from "./dynamodb";
+import dynamodb, { queryAll } from "./dynamodb";
 
 const userTable = config.table.user;
 const uniqueEmailTable = config.table.uniqueEmail;
@@ -19,22 +19,18 @@ class User {
   }
 
   static getAll = async (): Promise<User[]> => {
-    const { Items: userItems } = await dynamodb
-      .scan({
-        TableName: userTable,
-      })
-      .promise();
+    const userItems = await queryAll({
+      TableName: userTable,
+    });
     return map(userItems, (user) => {
       return new User(user as UserData);
     });
   };
 
   static getAllUniqueEmails = async (): Promise<string[]> => {
-    const { Items: uniqueEmailItems } = await dynamodb
-      .scan({
-        TableName: uniqueEmailTable,
-      })
-      .promise();
+    const uniqueEmailItems = await queryAll({
+      TableName: uniqueEmailTable,
+    });
     return map(uniqueEmailItems, (uniqueEmail) => {
       return JSON.stringify(uniqueEmail);
     });
@@ -56,18 +52,14 @@ class User {
 
   static findOneByEmail = async (email: string): Promise<User | null> => {
     try {
-      const { Items: userItems } = await dynamodb
-        .query({
-          TableName: userTable,
-          IndexName: "EmailIndex",
-          KeyConditions: {
-            email: {
-              ComparisonOperator: "EQ",
-              AttributeValueList: [email],
-            },
-          },
-        })
-        .promise();
+      const userItems = await queryAll({
+        TableName: userTable,
+        IndexName: "EmailIndex",
+        KeyConditionExpression: "email = :email",
+        ExpressionAttributeValues: {
+          ":email": email,
+        },
+      });
 
       if (isEmpty(userItems)) return null;
 
@@ -99,7 +91,9 @@ class User {
       throw Error();
     }
 
-    const userData = { ...data, id };
+    const hashPassword = await hash(password);
+
+    const userData = { ...data, id, password: hashPassword };
 
     // check unique validation
     try {
@@ -156,25 +150,23 @@ class User {
     }
   };
 
-  static setEmail = async (id: string, email: string): Promise<void> => {
+  setEmail = async (email: string): Promise<void> => {
+    const { id } = this.data;
+
     const getPrevEmail = async (): Promise<string | null> => {
       try {
-        const { Items: emailPrevItem } = await dynamodb
-          .scan({
-            TableName: uniqueEmailTable,
-            IndexName: "IdIndex",
-            AttributesToGet: ["email"],
-            ScanFilter: {
-              id: {
-                ComparisonOperator: "EQ",
-                AttributeValueList: [id],
-              },
-            },
-          })
-          .promise();
+        const emailPrevItems = await queryAll({
+          TableName: uniqueEmailTable,
+          IndexName: "IdIndex",
+          ProjectionExpression: "email",
+          FilterExpression: "id = :id",
+          ExpressionAttributeValues: {
+            ":id": id,
+          },
+        });
 
-        if (!emailPrevItem) throw Error();
-        const prevEmail = emailPrevItem[0].email;
+        if (isEmpty(emailPrevItems)) throw Error();
+        const prevEmail = emailPrevItems[0].email as string;
         if (!prevEmail) throw Error();
 
         return prevEmail;
@@ -245,25 +237,23 @@ class User {
     }
   };
 
-  static setUserName = async (id: string, userName: string): Promise<void> => {
+  setUserName = async (userName: string): Promise<void> => {
+    const { id } = this.data;
+
     const getPrevUserName = async (): Promise<string | null> => {
       try {
-        const { Items: userNamePrevItem } = await dynamodb
-          .scan({
-            TableName: uniqueUserNameTable,
-            IndexName: "IdIndex",
-            AttributesToGet: ["userName"],
-            ScanFilter: {
-              id: {
-                ComparisonOperator: "EQ",
-                AttributeValueList: [id],
-              },
-            },
-          })
-          .promise();
+        const userNamePrevItems = await queryAll({
+          TableName: uniqueUserNameTable,
+          IndexName: "IdIndex",
+          ProjectionExpression: "userName",
+          FilterExpression: "id = :id",
+          ExpressionAttributeValues: {
+            ":id": id,
+          },
+        });
 
-        if (!userNamePrevItem) throw Error();
-        const prevUserName = userNamePrevItem[0].userName;
+        if (!userNamePrevItems) throw Error();
+        const prevUserName = userNamePrevItems[0].userName as string;
         if (!prevUserName) throw Error();
 
         return prevUserName;
@@ -340,9 +330,10 @@ class User {
     }
   };
 
-  static setPassword = async (id: string, password: string): Promise<void> => {
-    // register new userName
+  setPassword = async (password: string): Promise<void> => {
+    const { id } = this.data;
 
+    // register new userName
     try {
       await dynamodb
         .update({
