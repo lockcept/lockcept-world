@@ -168,10 +168,10 @@ resources:
       Properties:
         TableName: ${self:custom.tables.account-table}
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: userId
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: userId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1

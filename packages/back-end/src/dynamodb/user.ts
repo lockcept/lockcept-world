@@ -22,27 +22,6 @@ class User {
     this.data = data;
   }
 
-  static findOneByEmail = async (email: string): Promise<User | null> => {
-    try {
-      const userItems = await queryAll({
-        TableName: userTable,
-        IndexName: "EmailIndex",
-        KeyConditionExpression: "email = :email",
-        ExpressionAttributeValues: {
-          ":email": email,
-        },
-      });
-
-      if (isEmpty(userItems)) return null;
-      const userData = userItems[0] as UserData;
-      if (!userData) throw Error();
-      return new User(userData);
-    } catch (e) {
-      errorLogger("Failed at findOneByEmail", { email });
-      throw e;
-    }
-  };
-
   static create = async (data: Omit<UserData, "id">): Promise<void> => {
     const id = nanoid();
     const { email, password, userName } = data;
@@ -116,6 +95,40 @@ class User {
         errorLogger("User already exist at createUserItem", userData);
         throw Error();
       }
+      throw e;
+    }
+  };
+
+  static get = async (id: string): Promise<User | null> => {
+    try {
+      const { Item: user } = await dynamodb
+        .get({ TableName: userTable, Key: { id } })
+        .promise();
+      if (!user) return null;
+      return user as User;
+    } catch (e) {
+      errorLogger("Failed at get User", { id });
+      throw e;
+    }
+  };
+
+  static findOneByEmail = async (email: string): Promise<User | null> => {
+    try {
+      const userItems = await queryAll({
+        TableName: userTable,
+        IndexName: "EmailIndex",
+        KeyConditionExpression: "email = :email",
+        ExpressionAttributeValues: {
+          ":email": email,
+        },
+      });
+
+      if (isEmpty(userItems)) return null;
+      const userData = userItems[0] as UserData;
+      if (!userData) throw Error();
+      return new User(userData);
+    } catch (e) {
+      errorLogger("Failed at findOneByEmail", { email });
       throw e;
     }
   };

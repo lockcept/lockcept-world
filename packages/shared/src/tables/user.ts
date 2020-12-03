@@ -12,20 +12,14 @@ export interface UniqueUserNameData {
   id: string;
 }
 
-export interface AccountData {
-  id: string;
-  site?: string;
-  comment?: string;
-}
-
 export const validateEmail = (email: string) => {
-  return email && validator.isEmail(email);
+  return !!email && validator.isEmail(email) && email.length < 255;
 };
 
 export const validatePassword = (password: string) => {
-  return password;
+  return !!password && password.length < 16;
 };
 
 export const validateUserName = (userName: string) => {
-  return userName && validator.isAlphanumeric;
+  return !!userName && validator.isAlphanumeric && userName.length < 16;
 };

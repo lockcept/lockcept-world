@@ -1,14 +1,15 @@
-import { UserData } from "@lockcept/shared";
+import { AccountData, UserData } from "@lockcept/shared";
 import express from "express";
 import { map } from "lodash";
 import { config } from "../../config";
+import Account from "../../dynamodb/account";
 import { scanAll } from "../../dynamodb/dynamodb";
 import User from "../../dynamodb/user";
-import { hash } from "../../helper";
 import { errorLogger } from "../../logger";
 
 const userTable = config.table.user;
 const uniqueEmailTable = config.table.uniqueEmail;
+const accountTable = config.table.account;
 
 const getAllUsers = async (): Promise<User[]> => {
   const userItems = await scanAll({
@@ -25,6 +26,15 @@ const getAllUniqueEmails = async (): Promise<string[]> => {
   });
   return map(uniqueEmailItems, (uniqueEmail) => {
     return JSON.stringify(uniqueEmail);
+  });
+};
+
+const getAllAccounts = async (): Promise<Account[]> => {
+  const accountItems = await scanAll({
+    TableName: accountTable,
+  });
+  return map(accountItems, (account) => {
+    return new Account(account as AccountData);
   });
 };
 
@@ -51,18 +61,15 @@ router.get("/user", async (req, res) => {
   }
 });
 
-router.get("/user/create", async (req, res) => {
+router.get("/account", async (req, res) => {
   try {
-    const hashPassword = await hash("lockcept");
-    await User.create({
-      email: "lockcept@gmail.com",
-      password: hashPassword,
-      userName: "lockcept",
+    const userItems = await getAllAccounts();
+    res.json({
+      message: userItems,
     });
-    res.json({ message: "Good!" });
   } catch (e) {
     errorLogger(e);
-    res.json({ message: "Failed to create" });
+    res.sendStatus(500);
   }
 });
 

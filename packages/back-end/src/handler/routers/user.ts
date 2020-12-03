@@ -16,6 +16,7 @@ router.patch("/users/:userId/emails/:email", async (req, res) => {
     res.sendStatus(200);
   } catch (e) {
     errorLogger("Failed to set email", { id, email });
+    errorLogger(e);
     res.sendStatus(500);
   }
 });
@@ -31,6 +32,7 @@ router.patch("/users/:userId/passwords/:password", async (req, res) => {
     res.sendStatus(200);
   } catch (e) {
     errorLogger("Failed to set password", { id, password });
+    errorLogger(e);
     res.sendStatus(500);
   }
 });
@@ -46,6 +48,7 @@ router.patch("/users/:userId/usernames/:username", async (req, res) => {
     res.sendStatus(200);
   } catch (e) {
     errorLogger("Failed to set userName", { id, userName });
+    errorLogger(e);
     res.sendStatus(500);
   }
 });
@@ -61,6 +64,7 @@ router.get("/users/:userId", async (req, res) => {
     res.status(200).send(JSON.stringify(userResponseData));
   } catch (e) {
     errorLogger("Failed to get userData", { id });
+    errorLogger(e);
     res.sendStatus(500);
   }
 });
