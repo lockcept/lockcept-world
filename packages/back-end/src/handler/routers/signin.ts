@@ -37,16 +37,16 @@ passport.use(
   )
 );
 
-signinRouter.post("/signin/local", (req, res, next) => {
+signinRouter.post("/local", (req, res, next) => {
   const { userData } = req.body;
   const { email, password } = userData;
 
-  req.url = "/auth/signin/local";
+  req.url = "/auth/local";
   req.body = { email, password };
   next();
 });
 
-signinRouter.post("/auth/signin/local", (req, res) => {
+signinRouter.post("/auth/local", (req, res) => {
   passport.authenticate(
     "local",
     {
@@ -67,13 +67,13 @@ signinRouter.post("/auth/signin/local", (req, res) => {
   )(req, res);
 });
 
-signinRouter.post("/signin/google", (req, res) => {
+signinRouter.post("/google", (req, res) => {
   res.json({
     message: "signin",
   });
 });
 
-signinRouter.post("/auth/signin/google", (req, res) => {
+signinRouter.post("/auth/google", (req, res) => {
   res.json({
     message: "signinGoogle",
   });

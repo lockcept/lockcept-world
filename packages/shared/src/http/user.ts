@@ -1,13 +1,5 @@
 import { UserData } from "../tables/user";
 
-export interface CreateUserRequest {
+export interface SignupLocalRequest {
   userData: Omit<UserData, "id">;
-}
-
-export interface CreateUserResponse {
-  ifCreated: boolean;
-}
-
-export interface CheckUserResponse {
-  ifExist: boolean;
 }

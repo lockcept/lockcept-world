@@ -66,8 +66,6 @@ class User {
       });
 
       if (isEmpty(userItems)) return null;
-
-      if (!userItems) throw Error();
       const userData = userItems[0] as UserData;
       if (!userData) throw Error();
       return new User(userData);
@@ -87,7 +85,6 @@ class User {
       errorLogger("Invalid Email at createUserItem", { email });
       throw Error();
     }
-
     if (!validatePassword(password)) {
       errorLogger("Invalid Password at createUserItem", { password });
       throw Error();
@@ -98,7 +95,6 @@ class User {
     }
 
     const hashPassword = await hash(password);
-
     const userData = { ...data, id, password: hashPassword };
 
     // check unique validation

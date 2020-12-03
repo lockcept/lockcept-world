@@ -1,17 +1,15 @@
-import { CreateUserRequest } from "@lockcept/shared";
+import { SignupLocalRequest } from "@lockcept/shared";
 import express from "express";
 import User from "../../dynamodb/user";
-import { hash } from "../../helper";
 import { errorLogger } from "../../logger";
 
 const signupRouter = express.Router();
 
 signupRouter.post("/signup/local", async (req, res) => {
-  const { userData } = req.body as CreateUserRequest;
+  const { userData } = req.body as SignupLocalRequest;
   try {
     const { email, password, userName } = userData;
-    const hashedPassword = await hash(password);
-    await User.create({ email, password: hashedPassword, userName });
+    await User.create({ email, password, userName });
     res.sendStatus(200);
   } catch (e) {
     errorLogger("Failed to signup", userData);

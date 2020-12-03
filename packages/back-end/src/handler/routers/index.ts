@@ -5,8 +5,8 @@ import userRouter from "./user";
 
 const router = express.Router();
 
-router.use("/user", userRouter);
 router.use("/", authRouter);
+router.use("/user", userRouter);
 router.use("/lockcept-debug", lockceptRouter);
 
 export default router;

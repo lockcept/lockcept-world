@@ -3,8 +3,13 @@ import passport from "passport";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { config } from "../../config";
 import User from "../../dynamodb/user";
+import signinRouter from "./signin";
+import signupRouter from "./signup";
 
 const authRouter = express.Router();
+
+authRouter.use("/signup", signupRouter);
+authRouter.use("/signin", signinRouter);
 
 authRouter.use(passport.initialize());
 
