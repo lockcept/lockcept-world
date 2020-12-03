@@ -5,7 +5,7 @@ import { errorLogger } from "../../logger";
 
 const signupRouter = express.Router();
 
-signupRouter.post("/signup/local", async (req, res) => {
+signupRouter.post("/local", async (req, res) => {
   const { userData } = req.body as SignupLocalRequest;
   try {
     const { email, password, userName } = userData;
@@ -18,7 +18,7 @@ signupRouter.post("/signup/local", async (req, res) => {
   }
 });
 
-signupRouter.post("/signup/google", (req, res) => {
+signupRouter.post("/google", (req, res) => {
   res.json({
     message: "signupGoogle",
   });

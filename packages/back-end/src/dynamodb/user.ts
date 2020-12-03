@@ -9,7 +9,7 @@ import { nanoid } from "nanoid";
 import { config } from "../config";
 import { compareHash, hash } from "../helper";
 import { errorLogger } from "../logger";
-import dynamodb, { queryAll } from "./dynamodb";
+import dynamodb, { queryAll, scanAll } from "./dynamodb";
 
 const userTable = config.table.user;
 const uniqueEmailTable = config.table.uniqueEmail;
@@ -23,7 +23,7 @@ class User {
   }
 
   static getAll = async (): Promise<User[]> => {
-    const userItems = await queryAll({
+    const userItems = await scanAll({
       TableName: userTable,
     });
     return map(userItems, (user) => {
@@ -32,7 +32,7 @@ class User {
   };
 
   static getAllUniqueEmails = async (): Promise<string[]> => {
-    const uniqueEmailItems = await queryAll({
+    const uniqueEmailItems = await scanAll({
       TableName: uniqueEmailTable,
     });
     return map(uniqueEmailItems, (uniqueEmail) => {

@@ -34,4 +34,23 @@ export const queryAll = async (
   return [...items, ...nextItems];
 };
 
+export const scanAll = async (
+  params: DynamoDB.DocumentClient.ScanInput,
+  prevLastKey?: DynamoDB.DocumentClient.Key
+): Promise<AttributeMap[]> => {
+  const actualParams = prevLastKey
+    ? {
+        ...params,
+        ExclusiveStartKey: prevLastKey,
+      }
+    : params;
+  const {
+    Items: items = [],
+    LastEvaluatedKey: lastEvaluatedKey,
+  } = await dynamodb.scan(actualParams).promise();
+  if (!lastEvaluatedKey) return items;
+  const nextItems = await scanAll(params, lastEvaluatedKey);
+  return [...items, ...nextItems];
+};
+
 export default dynamodb;
