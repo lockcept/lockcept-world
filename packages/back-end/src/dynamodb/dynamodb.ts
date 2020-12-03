@@ -1,4 +1,5 @@
 import { DynamoDB } from "aws-sdk";
+import { map } from "lodash";
 import { config } from "../config";
 
 type AttributeMap = DynamoDB.DocumentClient.AttributeMap;
@@ -51,6 +52,85 @@ export const scanAll = async (
   if (!lastEvaluatedKey) return items;
   const nextItems = await scanAll(params, lastEvaluatedKey);
   return [...items, ...nextItems];
+};
+
+const generateExpressionAttribute = (
+  attributeMap: AttributeMap
+): {
+  ExpressionAttributeNames: DynamoDB.DocumentClient.ExpressionAttributeNameMap;
+  ExpressionAttributeValues: DynamoDB.DocumentClient.ExpressionAttributeValueMap;
+  variables: { [name: string]: string };
+} => {
+  const getKeyForIndex = (index: number): string => {
+    const share = Math.floor(index / 26);
+    const remainder = index % 26;
+    const char = String.fromCharCode(97 + remainder);
+    if (share === 0) return char;
+    return `${getKeyForIndex(share - 1)}${char}`;
+  };
+  const entries = Object.entries(attributeMap);
+
+  const names: DynamoDB.DocumentClient.ExpressionAttributeNameMap = {};
+  const values: DynamoDB.DocumentClient.ExpressionAttributeValueMap = {};
+  const variables: { [name: string]: string } = {};
+
+  entries.forEach(([name, value], i) => {
+    const key = getKeyForIndex(i);
+    const nameVar = `#${key}`;
+    names[nameVar] = name;
+    const valueVar = `:${key}`;
+    values[valueVar] = value;
+    variables[nameVar] = valueVar;
+  });
+
+  return {
+    ExpressionAttributeNames: names,
+    ExpressionAttributeValues: values,
+    variables,
+  };
+};
+
+export const generateQueryParams = (
+  equalMap: AttributeMap
+): {
+  ExpressionAttributeNames: DynamoDB.DocumentClient.ExpressionAttributeNameMap;
+  ExpressionAttributeValues: DynamoDB.DocumentClient.ExpressionAttributeValueMap;
+  KeyConditionExpression: string;
+} => {
+  const {
+    ExpressionAttributeNames,
+    ExpressionAttributeValues,
+    variables,
+  } = generateExpressionAttribute(equalMap);
+  return {
+    ExpressionAttributeNames,
+    ExpressionAttributeValues,
+    KeyConditionExpression: map(variables, (val, name) => {
+      return `${name} = ${val}`;
+    }).join(" AND "),
+  };
+};
+
+export const generateUpdateParams = (
+  setMap: AttributeMap
+): {
+  ExpressionAttributeNames: DynamoDB.DocumentClient.ExpressionAttributeNameMap;
+  ExpressionAttributeValues: DynamoDB.DocumentClient.ExpressionAttributeValueMap;
+  UpdateExpression: string;
+} => {
+  const {
+    ExpressionAttributeNames,
+    ExpressionAttributeValues,
+    variables,
+  } = generateExpressionAttribute(setMap);
+  return {
+    ExpressionAttributeNames,
+    ExpressionAttributeValues,
+    UpdateExpression: `SET ${map(
+      variables,
+      (val, name) => `${name} = ${val}`
+    ).join(", ")}`,
+  };
 };
 
 export default dynamodb;
