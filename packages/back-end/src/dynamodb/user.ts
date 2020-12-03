@@ -9,7 +9,11 @@ import { nanoid } from "nanoid";
 import { config } from "../config";
 import { hash } from "../helper";
 import { errorLogger } from "../logger";
-import dynamodb, { queryAll } from "./dynamodb";
+import dynamodb, {
+  generateKeyConditionParams,
+  generateUpdateParams,
+  queryAll,
+} from "./dynamodb";
 
 const userTable = config.table.user;
 const uniqueEmailTable = config.table.uniqueEmail;
@@ -117,10 +121,7 @@ class User {
       const userItems = await queryAll({
         TableName: userTable,
         IndexName: "EmailIndex",
-        KeyConditionExpression: "email = :email",
-        ExpressionAttributeValues: {
-          ":email": email,
-        },
+        ...generateKeyConditionParams({ email }),
       });
 
       if (isEmpty(userItems)) return null;
@@ -142,10 +143,7 @@ class User {
           TableName: uniqueEmailTable,
           IndexName: "IdIndex",
           ProjectionExpression: "email",
-          FilterExpression: "id = :id",
-          ExpressionAttributeValues: {
-            ":id": id,
-          },
+          ...generateKeyConditionParams({ id }),
         });
 
         if (isEmpty(emailPrevItems)) throw Error();
@@ -183,9 +181,7 @@ class User {
         Key: {
           id,
         },
-        UpdateExpression: "set #a = :x",
-        ExpressionAttributeNames: { "#a": "email" },
-        ExpressionAttributeValues: { ":x": email },
+        ...generateUpdateParams({ email }),
       };
       await dynamodb
         .transactWrite({
@@ -229,10 +225,7 @@ class User {
           TableName: uniqueUserNameTable,
           IndexName: "IdIndex",
           ProjectionExpression: "userName",
-          FilterExpression: "id = :id",
-          ExpressionAttributeValues: {
-            ":id": id,
-          },
+          ...generateKeyConditionParams({ id }),
         });
 
         if (!userNamePrevItems) throw Error();
@@ -273,9 +266,7 @@ class User {
         Key: {
           id,
         },
-        UpdateExpression: "set #a = :x",
-        ExpressionAttributeNames: { "#a": "userName" },
-        ExpressionAttributeValues: { ":x": userName },
+        ...generateUpdateParams({ userName }),
       };
       await dynamodb
         .transactWrite({
@@ -315,8 +306,8 @@ class User {
 
   setPassword = async (password: string): Promise<void> => {
     const { id } = this.data;
+    const hashPassword = await hash(password);
 
-    // register new userName
     try {
       await dynamodb
         .update({
@@ -324,10 +315,8 @@ class User {
           Key: {
             id,
           },
-          UpdateExpression: "set #a = :x",
-          ExpressionAttributeNames: { "#a": "password" },
-          ExpressionAttributeValues: { ":x": password },
           ConditionExpression: "attribute_exists(id)",
+          ...generateUpdateParams({ password: hashPassword }),
         })
         .promise();
     } catch (e) {

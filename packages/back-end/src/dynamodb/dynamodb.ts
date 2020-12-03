@@ -90,7 +90,7 @@ const generateExpressionAttribute = (
   };
 };
 
-export const generateQueryParams = (
+export const generateKeyConditionParams = (
   equalMap: AttributeMap
 ): {
   ExpressionAttributeNames: DynamoDB.DocumentClient.ExpressionAttributeNameMap;
