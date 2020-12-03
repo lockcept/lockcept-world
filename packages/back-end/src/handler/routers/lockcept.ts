@@ -1,7 +1,32 @@
+import { UserData } from "@lockcept/shared";
 import express from "express";
+import { map } from "lodash";
+import { config } from "../../config";
+import { scanAll } from "../../dynamodb/dynamodb";
 import User from "../../dynamodb/user";
 import { hash } from "../../helper";
 import { errorLogger } from "../../logger";
+
+const userTable = config.table.user;
+const uniqueEmailTable = config.table.uniqueEmail;
+
+const getAllUsers = async (): Promise<User[]> => {
+  const userItems = await scanAll({
+    TableName: userTable,
+  });
+  return map(userItems, (user) => {
+    return new User(user as UserData);
+  });
+};
+
+const getAllUniqueEmails = async (): Promise<string[]> => {
+  const uniqueEmailItems = await scanAll({
+    TableName: uniqueEmailTable,
+  });
+  return map(uniqueEmailItems, (uniqueEmail) => {
+    return JSON.stringify(uniqueEmail);
+  });
+};
 
 const router = express.Router();
 
@@ -14,8 +39,8 @@ router.get("/", (req, res) => {
 
 router.get("/user", async (req, res) => {
   try {
-    const userItems = await User.getAll();
-    const uniqueEmailItems = await User.getAllUniqueEmails();
+    const userItems = await getAllUsers();
+    const uniqueEmailItems = await getAllUniqueEmails();
     res.json({
       message: userItems,
       message2: uniqueEmailItems,
@@ -38,18 +63,6 @@ router.get("/user/create", async (req, res) => {
   } catch (e) {
     errorLogger(e);
     res.json({ message: "Failed to create" });
-  }
-});
-
-router.post("/user/check-password", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    if (!email || !password) throw Error();
-    const compared = await User.comparePassword(email, password);
-    res.json({ message: compared });
-  } catch (e) {
-    errorLogger(e);
-    res.json({ message: "Failed" });
   }
 });
 

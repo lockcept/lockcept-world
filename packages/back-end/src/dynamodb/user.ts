@@ -4,12 +4,12 @@ import {
   validatePassword,
   validateUserName,
 } from "@lockcept/shared";
-import { isEmpty, map } from "lodash";
+import { isEmpty } from "lodash";
 import { nanoid } from "nanoid";
 import { config } from "../config";
-import { compareHash, hash } from "../helper";
+import { hash } from "../helper";
 import { errorLogger } from "../logger";
-import dynamodb, { queryAll, scanAll } from "./dynamodb";
+import dynamodb, { queryAll } from "./dynamodb";
 
 const userTable = config.table.user;
 const uniqueEmailTable = config.table.uniqueEmail;
@@ -21,38 +21,6 @@ class User {
   constructor(data: UserData) {
     this.data = data;
   }
-
-  static getAll = async (): Promise<User[]> => {
-    const userItems = await scanAll({
-      TableName: userTable,
-    });
-    return map(userItems, (user) => {
-      return new User(user as UserData);
-    });
-  };
-
-  static getAllUniqueEmails = async (): Promise<string[]> => {
-    const uniqueEmailItems = await scanAll({
-      TableName: uniqueEmailTable,
-    });
-    return map(uniqueEmailItems, (uniqueEmail) => {
-      return JSON.stringify(uniqueEmail);
-    });
-  };
-
-  static comparePassword = async (
-    email: string,
-    password: string
-  ): Promise<boolean> => {
-    try {
-      const user = await User.findOneByEmail(email);
-      if (!user) throw Error();
-      return compareHash(password, user.data.password);
-    } catch (e) {
-      errorLogger("Failed at comparePassword", { email, password });
-      throw e;
-    }
-  };
 
   static findOneByEmail = async (email: string): Promise<User | null> => {
     try {
