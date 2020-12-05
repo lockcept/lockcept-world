@@ -1,4 +1,8 @@
-import { AccountData, CreateAccountRequest } from "@lockcept/shared";
+import {
+  AccountData,
+  CreateAccountRequest,
+  validateAccountData,
+} from "@lockcept/shared";
 import express from "express";
 import { isNil } from "lodash";
 import Account from "../../dynamodb/account";
@@ -34,6 +38,9 @@ router.patch("/users/:userId", async (req, res) => {
     const user = req.user as User;
     if (user.data.id !== userId) {
       res.sendStatus(403);
+    }
+    if (!validateAccountData(accountData)) {
+      res.sendStatus(400);
     }
     const account = await Account.get(userId);
     if (isNil(account)) throw Error();

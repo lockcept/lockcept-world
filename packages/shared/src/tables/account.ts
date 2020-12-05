@@ -1,4 +1,4 @@
-import { isNil } from "lodash";
+import { isNil, isUndefined } from "lodash";
 
 export interface AccountData {
   userId: string;
@@ -8,14 +8,14 @@ export interface AccountData {
 
 export const validateAccountData = (data: Partial<AccountData>) => {
   const { site, comment } = data;
-  if (!isNil(site)) {
-    const check: boolean = !!site && site.length < 256;
+  if (!isUndefined(site)) {
+    const check: boolean = !isNil(site) && site.length < 256;
     if (!check) {
       return false;
     }
   }
-  if (!isNil(comment)) {
-    const check: boolean = !!comment && comment.length < 512;
+  if (!isUndefined(comment)) {
+    const check: boolean = !isNil(comment) && comment.length < 512;
     if (!check) {
       return false;
     }

@@ -68,6 +68,10 @@ class Account {
   update = async (data: Partial<AccountData>): Promise<Account> => {
     const updateData = pick(data, "site", "comment");
     try {
+      if (!validateAccountData(updateData)) {
+        errorLogger("Invalid accountdata at update account", data);
+        throw Error();
+      }
       const { Attributes: updatedData } = await dynamodb
         .update({
           TableName: accountTable,
@@ -79,7 +83,7 @@ class Account {
         })
         .promise();
       if (isNil(updatedData)) {
-        errorLogger("updatedData is nil in update account", data);
+        errorLogger("updatedData is nil at update account", data);
         throw Error();
       }
       const updatedAccountData = updatedData as AccountData;

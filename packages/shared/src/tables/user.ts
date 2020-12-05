@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import validator from "validator";
 
 export interface UserData {
@@ -13,13 +14,13 @@ export interface UniqueUserNameData {
 }
 
 export const validateEmail = (email: string) => {
-  return !!email && validator.isEmail(email) && email.length < 255;
+  return !isNil(email) && validator.isEmail(email) && email.length < 255;
 };
 
 export const validatePassword = (password: string) => {
-  return !!password && password.length < 16;
+  return !isNil(password) && password.length < 16;
 };
 
 export const validateUserName = (userName: string) => {
-  return !!userName && validator.isAlphanumeric && userName.length < 16;
+  return !isNil(userName) && validator.isAlphanumeric && userName.length < 16;
 };
