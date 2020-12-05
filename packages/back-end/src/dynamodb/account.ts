@@ -74,6 +74,7 @@ class Account {
           Key: {
             userId: this.data.userId,
           },
+          ReturnValues: "ALL_NEW",
           ...generateUpdateParams(updateData),
         })
         .promise();
@@ -84,7 +85,8 @@ class Account {
       const updatedAccountData = updatedData as AccountData;
       return new Account(updatedAccountData);
     } catch (e) {
-      errorLogger("Failed to update account", e);
+      errorLogger("Failed to update account", data);
+      errorLogger(e);
       throw e;
     }
   };
