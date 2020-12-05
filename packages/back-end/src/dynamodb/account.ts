@@ -1,8 +1,8 @@
 import { AccountData, validateAccountData } from "@lockcept/shared";
-import { isNil } from "lodash";
+import { isNil, pick } from "lodash";
 import { config } from "../config";
 import { errorLogger } from "../logger";
-import dynamodb from "./dynamodb";
+import dynamodb, { generateUpdateParams } from "./dynamodb";
 import User from "./user";
 
 const accountTable = config.table.account;
@@ -43,12 +43,37 @@ class Account {
         .promise();
     } catch (e) {
       if (e.code === "ConditionalCheckFailedException") {
-        errorLogger("Account already exist at serItem", data);
+        errorLogger("Account already exist at create account", data);
         throw Error();
       }
       throw e;
     }
-    return new Account(data);
+    const newAccountData = data as AccountData;
+    return new Account(newAccountData);
+  };
+
+  update = async (data: AccountData): Promise<Account> => {
+    const updateData = pick(data, "site", "comment");
+    try {
+      const { Attributes: updatedData } = await dynamodb
+        .update({
+          TableName: accountTable,
+          Key: {
+            userId: this.data.userId,
+          },
+          ...generateUpdateParams(updateData),
+        })
+        .promise();
+      if (isNil(updatedData)) {
+        errorLogger("updatedData is nil in update account", data);
+        throw Error();
+      }
+      const updatedAccountData = updatedData as AccountData;
+      return new Account(updatedAccountData);
+    } catch (e) {
+      errorLogger("Failed to update account", e);
+      throw e;
+    }
   };
 }
 
