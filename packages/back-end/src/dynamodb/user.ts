@@ -4,7 +4,7 @@ import {
   validatePassword,
   validateUserName,
 } from "@lockcept/shared";
-import { isEmpty } from "lodash";
+import { isEmpty, isNil } from "lodash";
 import { nanoid } from "nanoid";
 import { config } from "../config";
 import { hash } from "../helper";
@@ -105,11 +105,11 @@ class User {
 
   static get = async (id: string): Promise<User | null> => {
     try {
-      const { Item: user } = await dynamodb
+      const { Item: userData } = await dynamodb
         .get({ TableName: userTable, Key: { id } })
         .promise();
-      if (!user) return null;
-      return user as User;
+      if (isNil(userData)) return null;
+      return new User(userData as UserData);
     } catch (e) {
       errorLogger("Failed at get User", { id });
       throw e;
