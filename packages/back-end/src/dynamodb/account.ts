@@ -52,7 +52,20 @@ class Account {
     return new Account(newAccountData);
   };
 
-  update = async (data: AccountData): Promise<Account> => {
+  static get = async (userId: string): Promise<Account | null> => {
+    try {
+      const { Item: accountData } = await dynamodb
+        .get({ TableName: accountTable, Key: { userId } })
+        .promise();
+      if (isNil(accountData)) return null;
+      return new Account(accountData as AccountData);
+    } catch (e) {
+      errorLogger("Failed at get Account", { userId });
+      throw e;
+    }
+  };
+
+  update = async (data: Partial<AccountData>): Promise<Account> => {
     const updateData = pick(data, "site", "comment");
     try {
       const { Attributes: updatedData } = await dynamodb
