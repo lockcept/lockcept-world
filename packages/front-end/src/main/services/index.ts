@@ -11,7 +11,7 @@ const services: Service[] = [
     id: `account`,
     name: `Account`,
     content: `Sign in Your Own Account`,
-    link: `/signin`,
+    link: `/account`,
     image: `lockcept.svg`,
   },
   {

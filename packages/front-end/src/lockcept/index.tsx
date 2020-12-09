@@ -9,7 +9,7 @@ function Lockcept({ instance }: Props) {
   const [text, setText] = useState<string>("");
 
   const getData = useCallback(async () => {
-    const res = await instance.get("/lockcept");
+    const res = await instance.post("/",{test:"testasdf"});
     return setText(JSON.stringify(res.data));
   }, [instance]);
 

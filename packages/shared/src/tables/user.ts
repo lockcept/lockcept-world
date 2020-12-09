@@ -18,9 +18,19 @@ export const validateEmail = (email: string) => {
 };
 
 export const validatePassword = (password: string) => {
-  return !isNil(password) && password.length < 16;
+  return (
+    !isNil(password) &&
+    validator.isAlphanumeric(password) &&
+    password.length >= 8 &&
+    password.length <= 16
+  );
 };
 
 export const validateUserName = (userName: string) => {
-  return !isNil(userName) && validator.isAlphanumeric && userName.length < 16;
+  return (
+    !isNil(userName) &&
+    validator.isAlphanumeric(userName) &&
+    userName.length >= 8 &&
+    userName.length <= 16
+  );
 };

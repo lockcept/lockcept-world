@@ -2,15 +2,16 @@ import React from "react";
 import "./App.css";
 import Axios from "axios";
 import { Redirect, Route, Switch } from "react-router-dom";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core";
+import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
+import { ThemeProvider } from "@material-ui/core/styles";
 import Lockcept from "./lockcept";
 import Main from "./main";
-import Signin from "./sign/signin";
-import Signup from "./sign/signup";
+import Signin from "./auth/signin";
+import Signup from "./auth/signup";
 
 const getHttpEndPoints = () => {
   const httpEndPoints = {
-    dev: "http://localhost:4000/dev",
+    dev: "http://localhost:4000",
     prod: "https://api.lockcept.kr/prod",
   };
   const stage = process.env.REACT_APP_STAGE;
