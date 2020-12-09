@@ -8,6 +8,7 @@ import { isEmpty, isNil } from "lodash";
 import { nanoid } from "nanoid";
 import { config } from "../config";
 import { hash } from "../helper";
+import { CustomError } from "../helper/custom-error";
 import { errorLogger } from "../logger";
 import dynamodb, {
   generateKeyConditionParams,
@@ -34,15 +35,15 @@ class User {
 
     if (!validateEmail(email)) {
       errorLogger("Invalid Email at createUserItem", { email });
-      throw Error();
+      throw new CustomError("Invalid Email", { statusCode: 400 });
     }
     if (!validatePassword(password)) {
       errorLogger("Invalid Password at createUserItem", { password });
-      throw Error();
+      throw new CustomError("Invalid Password", { statusCode: 400 });
     }
     if (!validateUserName(userName)) {
       errorLogger("Invalid UserName at createUserItem", { userName });
-      throw Error();
+      throw new CustomError("Invalid UserName", { statusCode: 400 });
     }
 
     const hashPassword = await hash(password);
@@ -82,7 +83,7 @@ class User {
         .promise();
     } catch (e) {
       errorLogger("Failed to add unique data at createUserItem", userData);
-      throw e;
+      throw new CustomError("conflict user data", { statusCode: 409 });
     }
 
     // add new user
@@ -97,7 +98,7 @@ class User {
     } catch (e) {
       if (e.code === "ConditionalCheckFailedException") {
         errorLogger("User already exist at createUserItem", userData);
-        throw Error();
+        throw new CustomError("", { statusCode: 409 });
       }
       throw e;
     }
