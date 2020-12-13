@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   SignupLocalRequest,
   validateEmail,
@@ -77,9 +77,6 @@ function Signup({ instance }: Props) {
     currentPassword: "",
     confirmPassword: "",
   });
-  const [confirmPasswordValidation, setConfirmPasswordValidation] = useState<
-    string
-  >("");
   const [userNameValidation, setUserNameValidation] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
 
@@ -122,11 +119,9 @@ function Signup({ instance }: Props) {
     const confirmPassword = event.target.value;
     setPasswords((prevState) => ({ ...prevState, confirmPassword }));
   };
-
-  useEffect(() => {
-    if (passwords.currentPassword === passwords.confirmPassword)
-      setConfirmPasswordValidation("");
-    else setConfirmPasswordValidation("Your passwords are not equal");
+  const confirmPasswordValidation = useMemo(() => {
+    if (passwords.currentPassword === passwords.confirmPassword) return "";
+    return "Your passwords are not equal";
   }, [passwords]);
 
   useEffect(() => {
