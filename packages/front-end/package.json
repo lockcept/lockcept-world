@@ -28,7 +28,10 @@
     "eject": "react-scripts eject",
     "build:prod": "REACT_APP_STAGE=prod yarn build",
     "deploy:prod": "yarn build:prod && aws s3 sync build/ s3://lockcept.kr",
-    "postdeploy:prod": "aws cloudfront create-invalidation --distribution-id ESCB8YVB83R2Y --paths \"/*\""
+    "postdeploy:prod": "aws cloudfront create-invalidation --distribution-id ESCB8YVB83R2Y --paths \"/*\"",
+    "build:stg": "REACT_APP_STAGE=stg yarn build",
+    "deploy:stg": "yarn build:stg && aws s3 sync build/ s3://stg.lockcept.kr",
+    "postdeploy:stg": "aws cloudfront create-invalidation --distribution-id E1SMUU2I6PTPF3 --paths \"/*\""
   },
   "eslintConfig": {
     "extends": "react-app"

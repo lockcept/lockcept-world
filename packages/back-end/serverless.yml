@@ -36,6 +36,8 @@ custom:
 
 provider:
   name: aws
+  stackTags:
+    project: lockcept.kr
   stage: ${ opt:stage, "dev" }
   region: ap-northeast-2
   runtime: nodejs12.x

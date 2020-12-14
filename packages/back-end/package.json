@@ -38,6 +38,7 @@
   },
   "scripts": {
     "deploy:prod": "serverless deploy -s prod",
+    "deploy:stg": "serverless deploy -s stg",
     "build": "",
     "dev": "serverless offline start"
   }
