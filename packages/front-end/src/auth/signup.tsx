@@ -153,7 +153,7 @@ function Signup({ instance }: Props) {
       setUserNameValidation("");
     else
       setUserNameValidation(
-        "Your username does not meet the username requirements: alphabet, number, 8-16 length"
+        "Your username does not meet the username requirements: alphabet, number, 6-16 length"
       );
   };
 

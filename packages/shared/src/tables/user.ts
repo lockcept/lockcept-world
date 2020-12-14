@@ -30,7 +30,7 @@ export const validateUserName = (userName: string) => {
   return (
     !isNil(userName) &&
     validator.isAlphanumeric(userName) &&
-    userName.length >= 8 &&
+    userName.length >= 6 &&
     userName.length <= 16
   );
 };
