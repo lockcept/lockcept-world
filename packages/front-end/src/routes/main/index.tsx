@@ -14,15 +14,12 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core";
-import { AxiosInstance } from "axios";
-import React from "react";
+import React, { useMemo } from "react";
+import jwt from "jsonwebtoken";
 import { useHistory } from "react-router-dom";
+import { useLockceptContext } from "../../contexts/LockceptContext";
 import Footer from "./footer";
 import { links, services } from "./services";
-
-interface Props {
-  instance?: AxiosInstance;
-}
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -48,11 +45,21 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-function Main({ instance: _instance }: Props) {
+const Main = () => {
   const classes = useStyles();
   const history = useHistory();
+  const { signed, accessToken } = useLockceptContext();
   const serviceItems = services;
   const linkItems = links;
+
+  const userName = useMemo(() => {
+    const decoded = jwt.decode(accessToken);
+    if (!decoded) return "";
+    if (typeof decoded === "string") return "";
+    const { userName: decodedUserName } = decoded;
+    return decodedUserName;
+  }, [accessToken]);
+
   return (
     <>
       <Box id="toolbar">
@@ -61,14 +68,17 @@ function Main({ instance: _instance }: Props) {
             <Typography variant="h6" className={classes.title}>
               Lockcept World
             </Typography>
-            <Button
-              color="inherit"
-              onClick={() => {
-                history.push("/signin");
-              }}
-            >
-              Sign-in
-            </Button>
+            {!signed && (
+              <Button
+                color="inherit"
+                onClick={() => {
+                  history.push("/signin");
+                }}
+              >
+                Sign-in
+              </Button>
+            )}
+            {signed && userName}
           </Toolbar>
         </AppBar>
       </Box>
@@ -171,7 +181,7 @@ function Main({ instance: _instance }: Props) {
       <Footer />
     </>
   );
-}
+};
 
 Main.defaultProps = {
   instance: null,

@@ -14,32 +14,11 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Avatar from "@material-ui/core/Avatar";
-import { AxiosInstance } from "axios";
 import { useHistory } from "react-router-dom";
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
-import { errorLogger } from "../logger";
-
-interface Props {
-  instance: AxiosInstance;
-}
-
-function Alert(props: AlertProps) {
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://lockcept.kr/">
-        LOCKCEPT WORLD
-      </Link>{" "}
-      {new Date().getFullYear()}.
-    </Typography>
-  );
-}
+import { Copyright } from ".";
+import { errorLogger } from "../../logger";
+import { useLockceptContext } from "../../contexts/LockceptContext";
+import { AlertSnackbar } from "../../components";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -61,9 +40,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Signup({ instance }: Props) {
+const Signup = () => {
   const classes = useStyles();
   const history = useHistory();
+  const { instance } = useLockceptContext();
   const [canSubmit, setCanSubmit] = useState<boolean>(true);
   const [submitError, setSubmitError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -95,7 +75,7 @@ function Signup({ instance }: Props) {
       setSubmitError(true);
     }
     setLoading(false);
-  }, [instance, loading, email, passwords, userName, history]);
+  }, [loading, passwords, email, userName, instance, history]);
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputEmail = event.target.value;
     setEmail(inputEmail);
@@ -172,13 +152,14 @@ function Signup({ instance }: Props) {
                 required
                 fullWidth
                 id="email"
-                label="Email"
+                label="Email Address"
                 name="email"
                 autoComplete="email"
                 placeholder="lockcept@gmail.com"
                 error={emailValidation.length > 0}
                 helperText={emailValidation}
                 onChange={onEmailChange}
+                autoFocus
               />
             </Grid>
             <Grid item xs={12}>
@@ -204,7 +185,7 @@ function Signup({ instance }: Props) {
                 name="confirm-password"
                 label="Confirm Password"
                 type="password"
-                id="password"
+                id="confirm-password"
                 autoComplete="current-password"
                 error={confirmPasswordValidation.length > 0}
                 helperText={confirmPasswordValidation}
@@ -245,32 +226,17 @@ function Signup({ instance }: Props) {
             </Grid>
           </Grid>
         </form>
-        <Snackbar
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "left",
-          }}
-          open={submitError}
-          autoHideDuration={6000}
-          onClose={() => {
-            setSubmitError(false);
-          }}
-        >
-          <Alert
-            onClose={() => {
-              setSubmitError(false);
-            }}
-            severity="error"
-          >
-            Already exist
-          </Alert>
-        </Snackbar>
+        <AlertSnackbar
+          state={submitError}
+          setState={setSubmitError}
+          severity="error"
+        />
       </div>
       <Box mt={5}>
         <Copyright />
       </Box>
     </Container>
   );
-}
+};
 
 export default Signup;

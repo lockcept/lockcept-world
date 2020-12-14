@@ -1,31 +1,12 @@
 import React from "react";
 import "./App.css";
-import Axios from "axios";
 import { Redirect, Route, Switch } from "react-router-dom";
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import { ThemeProvider } from "@material-ui/core/styles";
-import Lockcept from "./lockcept";
-import Main from "./main";
-import Signin from "./auth/signin";
-import Signup from "./auth/signup";
-
-const getHttpEndPoints = () => {
-  const httpEndPoints = {
-    dev: "http://localhost:4000",
-    prod: "https://api.lockcept.kr/prod",
-    stg: "https://api.lockcept.kr/stg",
-  };
-  const stage = process.env.REACT_APP_STAGE;
-  if (!stage) return httpEndPoints.dev;
-  switch (stage) {
-    case "prod":
-      return httpEndPoints.prod;
-    case "stg":
-      return httpEndPoints.stg;
-    default:
-      return httpEndPoints.dev;
-  }
-};
+import Signup from "./routes/auth/signup";
+import Main from "./routes/main";
+import Signin from "./routes/auth/signin";
+import { LockceptContextProvider } from "./contexts/LockceptContext";
 
 const theme = createMuiTheme({
   palette: {
@@ -38,31 +19,29 @@ const theme = createMuiTheme({
   },
 });
 
-function App() {
-  const instance = Axios.create({
-    baseURL: getHttpEndPoints(),
-  });
+export const authProvider = React.createContext(null);
+
+const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <Switch>
-        <Route exact path="/lockcept">
-          <Lockcept instance={instance} />
-        </Route>
-        <Route exact path="/signin">
-          <Signin instance={instance} />
-        </Route>
-        <Route exact path="/signup">
-          <Signup instance={instance} />
-        </Route>
-        <Route exact path="/">
-          <Main />
-        </Route>
-        <Route>
-          <Redirect to="/" />
-        </Route>
-      </Switch>
+      <LockceptContextProvider>
+        <Switch>
+          <Route exact path="/signin">
+            <Signin />
+          </Route>
+          <Route exact path="/signup">
+            <Signup />
+          </Route>
+          <Route exact path="/">
+            <Main />
+          </Route>
+          <Route>
+            <Redirect to="/" />
+          </Route>
+        </Switch>
+      </LockceptContextProvider>
     </ThemeProvider>
   );
-}
+};
 
 export default App;

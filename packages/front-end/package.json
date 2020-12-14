@@ -5,6 +5,7 @@
   "dependencies": {
     "@lockcept/shared": "link:./../shared",
     "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -14,6 +15,7 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "axios": "^0.20.0",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -49,6 +51,7 @@
     ]
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.0",
     "@types/lodash": "^4.14.161",
     "@types/react-router-dom": "^5.1.5"
   }

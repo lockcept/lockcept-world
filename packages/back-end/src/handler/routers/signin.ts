@@ -3,6 +3,7 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 import { Strategy as LocalStrategy } from "passport-local";
 import { omit } from "lodash";
+import { SigninLocalRequest, SigninLocalResponse } from "@lockcept/shared";
 import User from "../../dynamodb/user";
 import { compareHash } from "../../helper";
 import { errorLogger } from "../../logger";
@@ -38,8 +39,7 @@ passport.use(
 );
 
 signinRouter.post("/local", (req, res, next) => {
-  const { userData } = req.body;
-  const { email, password } = userData;
+  const { email, password } = req.body as SigninLocalRequest;
 
   req.url = "/auth/local";
   req.body = { email, password };
@@ -61,7 +61,8 @@ signinRouter.post("/auth/local", (req, res) => {
         const token = jwt.sign(omit(user.data, "password"), jwtKey, {
           expiresIn: "1d",
         });
-        return res.json({ token });
+        const resBody: SigninLocalResponse = { token };
+        return res.json(resBody);
       });
     }
   )(req, res);
