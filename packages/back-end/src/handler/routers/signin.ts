@@ -9,11 +9,17 @@ import { compareHash } from "../../helper";
 import { errorLogger } from "../../logger";
 import { config } from "../../config";
 
+/**
+ * router for signin
+ */
 const signinRouter = express.Router();
 const jwtKey = config.key.JWT_USER;
 
 signinRouter.use(passport.initialize());
 
+/**
+ * signin local
+ */
 passport.use(
   new LocalStrategy(
     {
@@ -68,6 +74,9 @@ signinRouter.post("/auth/local", (req, res) => {
   )(req, res);
 });
 
+/**
+ * signin google (WIP)
+ */
 signinRouter.post("/google", (req, res) => {
   res.json({
     message: "signin",

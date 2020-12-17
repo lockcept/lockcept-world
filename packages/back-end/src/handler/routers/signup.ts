@@ -3,8 +3,14 @@ import express from "express";
 import User from "../../dynamodb/user";
 import { errorLogger } from "../../logger";
 
+/**
+ * router for signup
+ */
 const signupRouter = express.Router();
 
+/**
+ * signup local
+ */
 signupRouter.post("/local", async (req, res) => {
   const { userData } = req.body as SignupLocalRequest;
   try {
@@ -19,6 +25,9 @@ signupRouter.post("/local", async (req, res) => {
   }
 });
 
+/**
+ * signup google (WIP)
+ */
 signupRouter.post("/google", (req, res) => {
   res.json({
     message: "signupGoogle",

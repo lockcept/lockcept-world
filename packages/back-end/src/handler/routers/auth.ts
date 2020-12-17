@@ -6,8 +6,14 @@ import User from "../../dynamodb/user";
 import signinRouter from "./signin";
 import signupRouter from "./signup";
 
+/**
+ * router for auth
+ */
 const authRouter = express.Router();
 
+/**
+ * for signup and signin, do not auth
+ */
 authRouter.use("/signup", signupRouter);
 authRouter.use("/signin", signinRouter);
 
@@ -15,6 +21,9 @@ authRouter.use(passport.initialize());
 
 const jwtKey = config.key.JWT_USER;
 
+/**
+ * return JWT
+ */
 passport.use(
   new JwtStrategy(
     {
@@ -35,6 +44,9 @@ passport.use(
   )
 );
 
+/**
+ *  after of this router, authenticated users can only access
+ */
 authRouter.use("/", passport.authenticate("jwt", { session: false }));
 
 export default authRouter;

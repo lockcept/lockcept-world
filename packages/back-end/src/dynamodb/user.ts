@@ -20,6 +20,9 @@ const userTable = config.table.user;
 const uniqueEmailTable = config.table.uniqueEmail;
 const uniqueUserNameTable = config.table.uniqueUserName;
 
+/**
+ * User model
+ */
 class User {
   data: UserData;
 
@@ -27,12 +30,15 @@ class User {
     this.data = data;
   }
 
+  /**
+   * Creates a new user
+   * @param data UserData to create a new user
+   */
   static create = async (data: Omit<UserData, "id">): Promise<void> => {
     const id = nanoid();
     const { email, password, userName } = data;
 
     // check data validation
-
     if (!validateEmail(email)) {
       errorLogger("Invalid Email at createUserItem", { email });
       throw new CustomError("Invalid Email", { statusCode: 400 });
@@ -86,7 +92,7 @@ class User {
       throw new CustomError("conflict user data", { statusCode: 409 });
     }
 
-    // add new user
+    // add a new user
     try {
       await dynamodb
         .put({
@@ -104,6 +110,10 @@ class User {
     }
   };
 
+  /**
+   * Returns an account with userId
+   * @param userId userId to get an account
+   */
   static get = async (id: string): Promise<User | null> => {
     try {
       const { Item: userData } = await dynamodb
@@ -117,24 +127,10 @@ class User {
     }
   };
 
-  static findOneByEmail = async (email: string): Promise<User | null> => {
-    try {
-      const userItems = await queryAll({
-        TableName: userTable,
-        IndexName: "EmailIndex",
-        ...generateKeyConditionParams({ email }),
-      });
-
-      if (isEmpty(userItems)) return null;
-      const userData = userItems[0] as UserData;
-      if (!userData) throw Error();
-      return new User(userData);
-    } catch (e) {
-      errorLogger("Failed at findOneByEmail", { email });
-      throw e;
-    }
-  };
-
+  /**
+   * Updates email with uniqueness checking
+   * @param email email to update
+   */
   setEmail = async (email: string): Promise<void> => {
     const { id } = this.data;
 
@@ -217,6 +213,10 @@ class User {
     }
   };
 
+  /**
+   * Updates userName with uniqueness checking
+   * @param userName userName to update
+   */
   setUserName = async (userName: string): Promise<void> => {
     const { id } = this.data;
 
@@ -305,6 +305,10 @@ class User {
     }
   };
 
+  /**
+   * Updates password
+   * @param password password to update
+   */
   setPassword = async (password: string): Promise<void> => {
     const { id } = this.data;
     const hashPassword = await hash(password);
@@ -325,6 +329,28 @@ class User {
         errorLogger("User id does not exist at setPassword", { id });
         throw Error();
       }
+      throw e;
+    }
+  };
+
+  /**
+   * Returns an user with email
+   * @param email email to find user with
+   */
+  static findOneByEmail = async (email: string): Promise<User | null> => {
+    try {
+      const userItems = await queryAll({
+        TableName: userTable,
+        IndexName: "EmailIndex",
+        ...generateKeyConditionParams({ email }),
+      });
+
+      if (isEmpty(userItems)) return null;
+      const userData = userItems[0] as UserData;
+      if (!userData) throw Error();
+      return new User(userData);
+    } catch (e) {
+      errorLogger("Failed at findOneByEmail", { email });
       throw e;
     }
   };

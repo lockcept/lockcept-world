@@ -7,6 +7,9 @@ import User from "./user";
 
 const accountTable = config.table.account;
 
+/**
+ * Account model
+ */
 class Account {
   data: AccountData;
 
@@ -14,6 +17,10 @@ class Account {
     this.data = data;
   }
 
+  /**
+   * Creates a new account
+   * @param data AccountData to create a new account
+   */
   static create = async (data: AccountData): Promise<Account | null> => {
     const { userId, site, comment } = data;
 
@@ -52,6 +59,10 @@ class Account {
     return new Account(newAccountData);
   };
 
+  /**
+   * Returns an account with userId
+   * @param userId userId to get an account
+   */
   static get = async (userId: string): Promise<Account | null> => {
     try {
       const { Item: accountData } = await dynamodb
@@ -65,6 +76,10 @@ class Account {
     }
   };
 
+  /**
+   * Updates an existing account
+   * @param data AccountData to update with
+   */
   update = async (data: Partial<AccountData>): Promise<Account> => {
     const updateData = pick(data, "site", "comment");
     try {

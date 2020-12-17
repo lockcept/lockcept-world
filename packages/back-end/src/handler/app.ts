@@ -8,10 +8,4 @@ app.use(cors());
 
 app.use("/", routers);
 
-app.get("/", (req, res) => {
-  res.json({
-    message: "hello lockcept world app",
-  });
-});
-
 export default app;

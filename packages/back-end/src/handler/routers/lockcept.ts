@@ -7,6 +7,11 @@ import { scanAll } from "../../dynamodb/dynamodb";
 import User from "../../dynamodb/user";
 import { errorLogger } from "../../logger";
 
+/**
+ * router for debug
+ */
+const router = express.Router();
+
 const userTable = config.table.user;
 const uniqueEmailTable = config.table.uniqueEmail;
 const accountTable = config.table.account;
@@ -37,8 +42,6 @@ const getAllAccounts = async (): Promise<Account[]> => {
     return new Account(account as AccountData);
   });
 };
-
-const router = express.Router();
 
 router.get("/", (req, res) => {
   const user = req.user as User;
