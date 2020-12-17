@@ -14,6 +14,7 @@ import { useHistory } from "react-router-dom";
 import { SigninLocalRequest, SigninLocalResponse } from "@lockcept/shared";
 import { useLockceptContext } from "../../contexts/LockceptContext";
 import { errorLogger } from "../../logger";
+import { AlertSnackbar } from "../../components";
 
 export const Copyright = () => {
   return (
@@ -53,6 +54,7 @@ const Signin = () => {
   const { instance, signed, setSigned, setAccessToken } = useLockceptContext();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [signinError, setSigninError] = useState<boolean>(false);
 
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputEmail = event.target.value;
@@ -78,6 +80,7 @@ const Signin = () => {
       errorLogger(e);
       setAccessToken("");
       setSigned(false);
+      setSigninError(true);
     }
   }, [email, history, instance, password, setAccessToken, setSigned, signed]);
 
@@ -133,6 +136,13 @@ const Signin = () => {
             </Grid>
           </Grid>
         </form>
+        <AlertSnackbar
+          state={signinError}
+          setState={setSigninError}
+          severity="error"
+        >
+          Failed to Signin
+        </AlertSnackbar>
       </div>
       <Box mt={8}>
         <Copyright />

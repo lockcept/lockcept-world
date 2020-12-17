@@ -230,7 +230,9 @@ const Signup = () => {
           state={submitError}
           setState={setSubmitError}
           severity="error"
-        />
+        >
+          Already Exist
+        </AlertSnackbar>
       </div>
       <Box mt={5}>
         <Copyright />

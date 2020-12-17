@@ -3,6 +3,7 @@ import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert, { AlertProps, Color } from "@material-ui/lab/Alert";
 
 interface Props {
+  children: any;
   state: boolean;
   setState: (state: boolean) => void;
   severity: Color;
@@ -13,7 +14,12 @@ const Alert = (props: AlertProps) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 };
 
-export const AlertSnackbar = ({ state, setState, severity }: Props) => {
+export const AlertSnackbar = ({
+  children,
+  state,
+  setState,
+  severity,
+}: Props) => {
   return (
     <Snackbar
       anchorOrigin={{
@@ -32,7 +38,7 @@ export const AlertSnackbar = ({ state, setState, severity }: Props) => {
         }}
         severity={severity}
       >
-        Already exist
+        {children}
       </Alert>
     </Snackbar>
   );
