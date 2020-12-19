@@ -36,7 +36,9 @@ class User {
    */
   static create = async (data: Omit<UserData, "id">): Promise<void> => {
     const id = nanoid();
-    const { email, password, userName } = data;
+    const { email: rawEmail, password, userName: rawUserName } = data;
+    const email = rawEmail.toLowerCase();
+    const userName = rawUserName.toLowerCase();
 
     // check data validation
     if (!validateEmail(email)) {
@@ -131,8 +133,9 @@ class User {
    * Updates email with uniqueness checking
    * @param email email to update
    */
-  setEmail = async (email: string): Promise<void> => {
+  setEmail = async (rawEmail: string): Promise<void> => {
     const { id } = this.data;
+    const email = rawEmail.toLowerCase();
 
     const getPrevEmail = async (): Promise<string | null> => {
       try {
@@ -217,8 +220,9 @@ class User {
    * Updates userName with uniqueness checking
    * @param userName userName to update
    */
-  setUserName = async (userName: string): Promise<void> => {
+  setUserName = async (rawUserName: string): Promise<void> => {
     const { id } = this.data;
+    const userName = rawUserName.toLowerCase();
 
     const getPrevUserName = async (): Promise<string | null> => {
       try {
@@ -337,7 +341,8 @@ class User {
    * Returns an user with email
    * @param email email to find user with
    */
-  static findOneByEmail = async (email: string): Promise<User | null> => {
+  static findOneByEmail = async (rawEmail: string): Promise<User | null> => {
+    const email = rawEmail.toLowerCase();
     try {
       const userItems = await queryAll({
         TableName: userTable,
