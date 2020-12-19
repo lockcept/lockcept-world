@@ -55,6 +55,7 @@ const Signin = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [signinError, setSigninError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputEmail = event.target.value;
@@ -66,6 +67,7 @@ const Signin = () => {
   };
   const handleSignin = useCallback(async () => {
     if (signed) return;
+    setLoading(true);
     try {
       const reqBody: SigninLocalRequest = { email, password };
       const res = await instance.post<SigninLocalResponse>(
@@ -82,6 +84,7 @@ const Signin = () => {
       setSigned(false);
       setSigninError(true);
     }
+    setLoading(false);
   }, [email, history, instance, password, setAccessToken, setSigned, signed]);
 
   return (
@@ -106,6 +109,9 @@ const Signin = () => {
             autoComplete="email"
             autoFocus
             onChange={onEmailChange}
+            onKeyPress={(event) => {
+              if (event.key === "Enter" && !loading) handleSignin();
+            }}
           />
           <TextField
             variant="outlined"
@@ -118,6 +124,9 @@ const Signin = () => {
             id="password"
             autoComplete="current-password"
             onChange={onPasswordChange}
+            onKeyPress={(event) => {
+              if (event.key === "Enter" && !loading) handleSignin();
+            }}
           />
           <Button
             fullWidth
@@ -125,6 +134,7 @@ const Signin = () => {
             color="primary"
             className={classes.submit}
             onClick={handleSignin}
+            disabled={loading}
           >
             Sign In
           </Button>

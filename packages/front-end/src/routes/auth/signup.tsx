@@ -148,6 +148,7 @@ const Signup = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
+                autoFocus
                 variant="outlined"
                 required
                 fullWidth
@@ -159,7 +160,9 @@ const Signup = () => {
                 error={emailValidation.length > 0}
                 helperText={emailValidation}
                 onChange={onEmailChange}
-                autoFocus
+                onKeyPress={(event) => {
+                  if (event.key === "Enter" && canSubmit) handleSignup();
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -175,6 +178,9 @@ const Signup = () => {
                 error={passwordValidation.length > 0}
                 helperText={passwordValidation}
                 onChange={onPasswordChange}
+                onKeyPress={(event) => {
+                  if (event.key === "Enter" && canSubmit) handleSignup();
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -190,6 +196,9 @@ const Signup = () => {
                 error={confirmPasswordValidation.length > 0}
                 helperText={confirmPasswordValidation}
                 onChange={onConfirmPasswordChange}
+                onKeyPress={(event) => {
+                  if (event.key === "Enter" && canSubmit) handleSignup();
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -205,6 +214,9 @@ const Signup = () => {
                 error={userNameValidation.length > 0}
                 helperText={userNameValidation}
                 onChange={onUserNameChange}
+                onKeyPress={(event) => {
+                  if (event.key === "Enter" && canSubmit) handleSignup();
+                }}
               />
             </Grid>
           </Grid>
