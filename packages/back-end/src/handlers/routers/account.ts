@@ -5,8 +5,8 @@ import {
 } from "@lockcept/shared";
 import express from "express";
 import { isNil } from "lodash";
-import Account from "../../dynamodb/account";
-import User from "../../dynamodb/user";
+import Account from "../../models/account";
+import User from "../../models/user";
 import { errorLogger } from "../../logger";
 
 const router = express.Router();

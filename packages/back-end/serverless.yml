@@ -61,7 +61,7 @@ provider:
 
 functions:
   lockcept:
-    handler: src/handler/index.handler
+    handler: src/handlers/index.handler
     events:
       - http:
           path: /

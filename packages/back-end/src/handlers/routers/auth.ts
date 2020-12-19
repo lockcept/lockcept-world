@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { config } from "../../config";
-import User from "../../dynamodb/user";
+import User from "../../models/user";
 import signinRouter from "./signin";
 import signupRouter from "./signup";
 

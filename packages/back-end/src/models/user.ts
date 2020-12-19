@@ -7,8 +7,8 @@ import {
 import { isEmpty, isNil } from "lodash";
 import { nanoid } from "nanoid";
 import { config } from "../config";
-import { hash } from "../helper";
-import { CustomError } from "../helper/custom-error";
+import { hash, CustomError } from "../helpers";
+
 import { errorLogger } from "../logger";
 import dynamodb, {
   generateKeyConditionParams,

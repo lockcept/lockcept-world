@@ -2,10 +2,10 @@ import { AccountData, UserData } from "@lockcept/shared";
 import express from "express";
 import { map } from "lodash";
 import { config } from "../../config";
-import Account from "../../dynamodb/account";
-import { scanAll } from "../../dynamodb/dynamodb";
-import User from "../../dynamodb/user";
+import Account from "../../models/account";
+import User from "../../models/user";
 import { errorLogger } from "../../logger";
+import { scanAll } from "../../models/dynamodb";
 
 /**
  * router for debug

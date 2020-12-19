@@ -1,6 +1,6 @@
 import { SignupLocalRequest } from "@lockcept/shared";
 import express from "express";
-import User from "../../dynamodb/user";
+import User from "../../models/user";
 import { errorLogger } from "../../logger";
 
 /**

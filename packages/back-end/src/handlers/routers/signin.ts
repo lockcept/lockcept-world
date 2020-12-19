@@ -4,8 +4,8 @@ import jwt from "jsonwebtoken";
 import { Strategy as LocalStrategy } from "passport-local";
 import { omit } from "lodash";
 import { SigninLocalRequest, SigninLocalResponse } from "@lockcept/shared";
-import User from "../../dynamodb/user";
-import { compareHash } from "../../helper";
+import User from "../../models/user";
+import { compareHash } from "../../helpers";
 import { errorLogger } from "../../logger";
 import { config } from "../../config";
 

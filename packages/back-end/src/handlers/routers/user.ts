@@ -1,6 +1,6 @@
 import express from "express";
 import { omit } from "lodash";
-import User from "../../dynamodb/user";
+import User from "../../models/user";
 import { errorLogger } from "../../logger";
 
 const router = express.Router();
