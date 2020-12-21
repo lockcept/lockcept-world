@@ -1,4 +1,5 @@
 import {
+  ErrorName,
   UserData,
   validateEmail,
   validatePassword,
@@ -43,15 +44,24 @@ class User {
     // check data validation
     if (!validateEmail(email)) {
       errorLogger("Invalid Email at createUserItem", { email });
-      throw new CustomError("Invalid Email", { statusCode: 400 });
+      throw new CustomError("Invalid Email", {
+        name: ErrorName.InvalidEmail,
+        statusCode: 400,
+      });
     }
     if (!validatePassword(password)) {
       errorLogger("Invalid Password at createUserItem", { password });
-      throw new CustomError("Invalid Password", { statusCode: 400 });
+      throw new CustomError("Invalid Password", {
+        name: ErrorName.InvalidPassword,
+        statusCode: 400,
+      });
     }
     if (!validateUserName(userName)) {
       errorLogger("Invalid UserName at createUserItem", { userName });
-      throw new CustomError("Invalid UserName", { statusCode: 400 });
+      throw new CustomError("Invalid UserName", {
+        name: ErrorName.InvalidUserName,
+        statusCode: 400,
+      });
     }
 
     const hashPassword = await hash(password);
@@ -90,8 +100,22 @@ class User {
         })
         .promise();
     } catch (e) {
-      errorLogger("Failed to add unique data at createUserItem", userData);
-      throw new CustomError("conflict user data", { statusCode: 409 });
+      if (e.name === "TransactionCanceledException") {
+        errorLogger("Failed to add unique data at createUserItem", userData);
+        errorLogger(e);
+
+        if (await User.ifEmailExists(email))
+          throw new CustomError("conflict user data: email", {
+            name: ErrorName.ExistingEmail,
+            statusCode: 409,
+          });
+        if (await User.ifUserNameExists(userName))
+          throw new CustomError("conflict user data: userName", {
+            name: ErrorName.ExistingUserName,
+            statusCode: 409,
+          });
+      }
+      throw e;
     }
 
     // add a new user
@@ -105,8 +129,8 @@ class User {
         .promise();
     } catch (e) {
       if (e.code === "ConditionalCheckFailedException") {
-        errorLogger("User already exist at createUserItem", userData);
-        throw new CustomError("", { statusCode: 409 });
+        errorLogger("UserId already exist at createUserItem", userData);
+        throw new CustomError("", { statusCode: 500 });
       }
       throw e;
     }
@@ -333,6 +357,48 @@ class User {
         errorLogger("User id does not exist at setPassword", { id });
         throw Error();
       }
+      throw e;
+    }
+  };
+
+  /**
+   * Returns existance of email
+   * @param rawEmail
+   */
+  static ifEmailExists = async (rawEmail: string): Promise<boolean> => {
+    const email = rawEmail.toLowerCase();
+    try {
+      const { Item: user } = await dynamodb
+        .get({
+          TableName: uniqueEmailTable,
+          Key: { email },
+        })
+        .promise();
+      if (user) return true;
+      return false;
+    } catch (e) {
+      errorLogger("Failed to check email existance", { email });
+      throw e;
+    }
+  };
+
+  /**
+   * Returns existance of userName
+   * @param rawUserName
+   */
+  static ifUserNameExists = async (rawUserName: string): Promise<boolean> => {
+    const userName = rawUserName.toLowerCase();
+    try {
+      const { Item: user } = await dynamodb
+        .get({
+          TableName: uniqueUserNameTable,
+          Key: { userName },
+        })
+        .promise();
+      if (user) return true;
+      return false;
+    } catch (e) {
+      errorLogger("Failed to check userName existance", { userName });
       throw e;
     }
   };

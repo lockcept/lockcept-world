@@ -20,6 +20,11 @@ signupRouter.post("/local", async (req, res) => {
   } catch (e) {
     errorLogger("Failed to signup", userData);
     errorLogger(e);
+    if (e.options?.name) {
+      const statusCode = e.options?.statusCode ?? 500;
+      res.status(statusCode).json(e);
+      return;
+    }
     if (e.options?.statusCode) res.sendStatus(e.options.statusCode);
     else res.sendStatus(500);
   }

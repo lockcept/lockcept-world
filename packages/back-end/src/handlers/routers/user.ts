@@ -61,7 +61,7 @@ router.get("/users/:userId", async (req, res) => {
       res.sendStatus(403);
     }
     const userResponseData = omit(user.data, "password", "id");
-    res.status(200).send(JSON.stringify(userResponseData));
+    res.status(200).json(userResponseData);
   } catch (e) {
     errorLogger("Failed to get userData", { id });
     errorLogger(e);

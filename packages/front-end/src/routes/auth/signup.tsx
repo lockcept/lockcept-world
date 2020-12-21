@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ErrorName,
   SignupLocalRequest,
   validateEmail,
   validatePassword,
@@ -46,6 +47,7 @@ const Signup = () => {
   const { instance } = useLockceptContext();
   const [canSubmit, setCanSubmit] = useState<boolean>(true);
   const [submitError, setSubmitError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [emailValidation, setEmailValidation] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -68,10 +70,24 @@ const Signup = () => {
       const req: SignupLocalRequest = {
         userData: { email, password: currentPassword, userName },
       };
-      await instance.post("/signup/local", req).catch();
+      await instance.post("/signup/local", req);
       history.push("/");
     } catch (e) {
       errorLogger(e);
+      if (e.response) {
+        const errorData = e.response.data;
+        const errorName = errorData?.options?.name;
+        switch (errorName) {
+          case ErrorName.ExistingEmail:
+            setErrorMessage("Email Already Exists");
+            break;
+          case ErrorName.ExistingUserName:
+            setErrorMessage("UserName Already Exists");
+            break;
+          default:
+            setErrorMessage(e.response.message ?? "Unknown Error");
+        }
+      }
       setSubmitError(true);
     }
     setLoading(false);
@@ -243,7 +259,7 @@ const Signup = () => {
           setState={setSubmitError}
           severity="error"
         >
-          Already Exist
+          {errorMessage}
         </AlertSnackbar>
       </div>
       <Box mt={5}>
