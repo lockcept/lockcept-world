@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ErrorName,
   SignupLocalRequest,
@@ -45,13 +45,10 @@ const Signup = () => {
   const classes = useStyles();
   const history = useHistory();
   const { instance } = useLockceptContext();
-  const [canSubmit, setCanSubmit] = useState<boolean>(true);
   const [submitError, setSubmitError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [emailValidation, setEmailValidation] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [passwordValidation, setPasswordValidation] = useState<string>("");
   const [passwords, setPasswords] = useState<{
     currentPassword: string;
     confirmPassword: string;
@@ -92,22 +89,14 @@ const Signup = () => {
     }
     setLoading(false);
   }, [loading, passwords, email, userName, instance, history]);
+
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputEmail = event.target.value;
     setEmail(inputEmail);
-    if (inputEmail === "" || validateEmail(inputEmail)) setEmailValidation("");
-    else setEmailValidation("Please enter a valid email address.");
   };
   const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const password = event.target.value;
     setPasswords((prevState) => ({ ...prevState, currentPassword: password }));
-
-    if (password === "" || validatePassword(password))
-      setPasswordValidation("");
-    else
-      setPasswordValidation(
-        "Your password does not meet the password requirements: alphabet, number, 8-16 length"
-      );
   };
   const onConfirmPasswordChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -115,21 +104,32 @@ const Signup = () => {
     const confirmPassword = event.target.value;
     setPasswords((prevState) => ({ ...prevState, confirmPassword }));
   };
+
+  const emailValidation = useMemo(() => {
+    if (email === "" || validateEmail(email)) return "";
+    return "Please enter a valid email address.";
+  }, [email]);
+
+  const passwordValidation = useMemo(() => {
+    const password = passwords.currentPassword;
+    if (password === "" || validatePassword(password)) return "";
+    return "Your password does not meet the password requirements: alphabet, number, 8-16 length";
+  }, [passwords]);
   const confirmPasswordValidation = useMemo(() => {
     if (passwords.currentPassword === passwords.confirmPassword) return "";
     return "Your passwords are not equal";
   }, [passwords]);
 
-  useEffect(() => {
-    setCanSubmit(
+  const canSubmit = useMemo(() => {
+    return (
       !loading &&
-        emailValidation.length === 0 &&
-        email.length > 0 &&
-        passwordValidation.length === 0 &&
-        passwords.currentPassword.length > 0 &&
-        confirmPasswordValidation.length === 0 &&
-        userNameValidation.length === 0 &&
-        userName.length > 0
+      emailValidation.length === 0 &&
+      email.length > 0 &&
+      passwordValidation.length === 0 &&
+      passwords.currentPassword.length > 0 &&
+      confirmPasswordValidation.length === 0 &&
+      userNameValidation.length === 0 &&
+      userName.length > 0
     );
   }, [
     loading,
