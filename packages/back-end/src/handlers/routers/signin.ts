@@ -3,9 +3,13 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 import { Strategy as LocalStrategy } from "passport-local";
 import { omit } from "lodash";
-import { SigninLocalRequest, SigninLocalResponse } from "@lockcept/shared";
+import {
+  ErrorName,
+  SigninLocalRequest,
+  SigninLocalResponse,
+} from "@lockcept/shared";
 import User from "../../models/user";
-import { compareHash } from "../../helpers";
+import { compareHash, CustomError } from "../../helpers";
 import { errorLogger } from "../../logger";
 import { config } from "../../config";
 
@@ -30,10 +34,24 @@ passport.use(
       try {
         const user = await User.findOneByEmail(email);
         if (!user) {
-          return done(null, false, { message: "Incorrect email." });
+          return done(
+            new CustomError("Invalid email", {
+              name: ErrorName.InvalidEmail,
+              statusCode: 404,
+            }),
+            false,
+            { message: "Invalid email." }
+          );
         }
         if (!(await compareHash(password, user.data.password))) {
-          return done(null, false, { message: "Incorrect password." });
+          return done(
+            new CustomError("Invalid password", {
+              name: ErrorName.InvalidPassword,
+              statusCode: 403,
+            }),
+            false,
+            { message: "Invalid password." }
+          );
         }
         return done(null, user);
       } catch (e) {
@@ -59,7 +77,13 @@ signinRouter.post("/auth/local", (req, res) => {
       session: false,
     },
     (err, user: User) => {
-      if (err || !user) return res.sendStatus(403);
+      if (err || !user) {
+        if (err?.options?.name) {
+          const statusCode = err?.options?.statusCode ?? 500;
+          return res.status(statusCode).json(err);
+        }
+        return res.sendStatus(500);
+      }
       return req.login(user, { session: false }, (e) => {
         if (e) {
           return res.send(e);

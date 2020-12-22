@@ -11,7 +11,11 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { useHistory } from "react-router-dom";
-import { SigninLocalRequest, SigninLocalResponse } from "@lockcept/shared";
+import {
+  ErrorName,
+  SigninLocalRequest,
+  SigninLocalResponse,
+} from "@lockcept/shared";
 import { useLockceptContext } from "../../contexts/LockceptContext";
 import { errorLogger } from "../../logger";
 import { AlertSnackbar } from "../../components";
@@ -55,6 +59,7 @@ const Signin = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [signinError, setSigninError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,6 +87,20 @@ const Signin = () => {
       errorLogger(e);
       setAccessToken("");
       setSigned(false);
+      if (e.response) {
+        const errorData = e.response.data;
+        const errorName = errorData?.options?.name;
+        switch (errorName) {
+          case ErrorName.InvalidEmail:
+            setErrorMessage("Email Not Exists");
+            break;
+          case ErrorName.InvalidPassword:
+            setErrorMessage("Incorrect Password");
+            break;
+          default:
+            setErrorMessage(e.response.message ?? "Unknown Error");
+        }
+      }
       setSigninError(true);
     }
     setLoading(false);
@@ -151,7 +170,7 @@ const Signin = () => {
           setState={setSigninError}
           severity="error"
         >
-          Failed to Signin
+          {errorMessage}
         </AlertSnackbar>
       </div>
       <Box mt={8}>
