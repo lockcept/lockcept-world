@@ -35,53 +35,11 @@ const services: Service[] = [
     link: `/`,
     image: `lockcept.png`,
   },
-  {
-    id: `comming-soon-2`,
-    name: `comming-soon`,
-    content: `Comming Soon`,
-    link: `/`,
-    image: `lockcept.png`,
-  },
-  {
-    id: `comming-soon-3`,
-    name: `comming-soon`,
-    content: `Comming Soon`,
-    link: `/`,
-    image: `lockcept.png`,
-  },
-  {
-    id: `comming-soon-4`,
-    name: `comming-soon`,
-    content: `Comming Soon`,
-    link: `/`,
-    image: `lockcept.png`,
-  },
-  {
-    id: `comming-soon-5`,
-    name: `comming-soon`,
-    content: `Comming Soon`,
-    link: `/`,
-    image: `lockcept.png`,
-  },
 ] as Service[];
 
 const links: Service[] = [
   {
     id: `comming-soon-1`,
-    name: `comming-soon`,
-    content: `Comming Soon`,
-    link: `/`,
-    image: `lockcept.png`,
-  },
-  {
-    id: `comming-soon=2`,
-    name: `comming-soon`,
-    content: `Comming Soon`,
-    link: `/`,
-    image: `lockcept.png`,
-  },
-  {
-    id: `comming-soon-3`,
     name: `comming-soon`,
     content: `Comming Soon`,
     link: `/`,

@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
@@ -16,21 +15,9 @@ import {
   SigninLocalRequest,
   SigninLocalResponse,
 } from "@lockcept/shared";
-import { useLockceptContext } from "../../contexts/LockceptContext";
+import { useLockceptContext } from "../../contexts";
 import { errorLogger } from "../../logger";
-import { AlertSnackbar } from "../../components";
-
-export const Copyright = () => {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://lockcept.kr/">
-        LOCKCEPT WORLD
-      </Link>{" "}
-      {new Date().getFullYear()}.
-    </Typography>
-  );
-};
+import { AlertSnackbar, Copyright } from "../../components";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -108,7 +95,6 @@ const Signin = () => {
 
   return (
     <Container component="main" maxWidth="xs">
-      <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />

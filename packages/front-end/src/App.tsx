@@ -3,10 +3,11 @@ import "./App.css";
 import { Redirect, Route, Switch } from "react-router-dom";
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import { ThemeProvider } from "@material-ui/core/styles";
+import { CssBaseline } from "@material-ui/core";
 import Signup from "./routes/auth/signup";
-import Main from "./routes/main";
+import MainRouter from "./routes/main";
 import Signin from "./routes/auth/signin";
-import { LockceptContextProvider } from "./contexts/LockceptContext";
+import { LockceptContextProvider } from "./contexts";
 
 const theme = createMuiTheme({
   palette: {
@@ -23,24 +24,27 @@ export const authProvider = React.createContext(null);
 
 const App = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <LockceptContextProvider>
-        <Switch>
-          <Route exact path="/signin">
-            <Signin />
-          </Route>
-          <Route exact path="/signup">
-            <Signup />
-          </Route>
-          <Route exact path="/">
-            <Main />
-          </Route>
-          <Route>
-            <Redirect to="/" />
-          </Route>
-        </Switch>
-      </LockceptContextProvider>
-    </ThemeProvider>
+    <>
+      <CssBaseline />
+      <ThemeProvider theme={theme}>
+        <LockceptContextProvider>
+          <Switch>
+            <Route exact path="/signin">
+              <Signin />
+            </Route>
+            <Route exact path="/signup">
+              <Signup />
+            </Route>
+            <Route path="/">
+              <MainRouter />
+            </Route>
+            <Route>
+              <Redirect to="/" />
+            </Route>
+          </Switch>
+        </LockceptContextProvider>
+      </ThemeProvider>
+    </>
   );
 };
 

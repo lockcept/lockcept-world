@@ -16,10 +16,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Avatar from "@material-ui/core/Avatar";
 import { useHistory } from "react-router-dom";
-import { Copyright } from ".";
 import { errorLogger } from "../../logger";
-import { useLockceptContext } from "../../contexts/LockceptContext";
-import { AlertSnackbar } from "../../components";
+import { useLockceptContext } from "../../contexts";
+import { AlertSnackbar, Copyright } from "../../components";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
