@@ -7,6 +7,8 @@ import {
   ErrorName,
   SigninLocalRequest,
   SigninLocalResponse,
+  validateEmail,
+  validatePassword,
 } from "@lockcept/shared";
 import User from "../../models/user";
 import { compareHash, CustomError } from "../../helpers";
@@ -64,6 +66,10 @@ passport.use(
 
 signinRouter.post("/local", (req, res, next) => {
   const { email, password } = req.body as SigninLocalRequest;
+  if (!validateEmail(email) || !validatePassword(password)) {
+    res.sendStatus(400);
+    return;
+  }
 
   req.url = "/auth/local";
   req.body = { email, password };
@@ -80,6 +86,7 @@ signinRouter.post("/auth/local", (req, res) => {
       if (err || !user) {
         if (err?.options?.name) {
           const statusCode = err?.options?.statusCode ?? 500;
+          errorLogger(err);
           return res.status(statusCode).json(err);
         }
         return res.sendStatus(500);
