@@ -8,9 +8,9 @@ const router = express.Router();
 /**
  * routers
  */
-// router.use("/lockcept-debug", lockceptRouter);
 router.use("/", authRouter);
 router.use("/user", userRouter);
 router.use("/account", accountRouter);
+// router.use("/lockcept-debug", jwtUserAuth, lockceptRouter);
 
 export default router;

@@ -10,7 +10,7 @@ import { scanAll } from "../../models/dynamodb";
 /**
  * router for debug
  */
-const router = express.Router();
+const lockceptRouter = express.Router();
 
 const userTable = config.table.user;
 const uniqueEmailTable = config.table.uniqueEmail;
@@ -43,14 +43,14 @@ const getAllAccounts = async (): Promise<Account[]> => {
   });
 };
 
-router.get("/", (req, res) => {
+lockceptRouter.get("/", (req, res) => {
   const user = req.user as User;
   res.json({
-    message: `hello lockcept world ${JSON.stringify(user.data, null, 2)}`,
+    message: `hello lockcept world ${JSON.stringify(user ?? "asdf", null, 2)}`,
   });
 });
 
-router.get("/user", async (req, res) => {
+lockceptRouter.get("/user", async (req, res) => {
   try {
     const userItems = await getAllUsers();
     const uniqueEmailItems = await getAllUniqueEmails();
@@ -64,7 +64,7 @@ router.get("/user", async (req, res) => {
   }
 });
 
-router.get("/account", async (req, res) => {
+lockceptRouter.get("/account", async (req, res) => {
   try {
     const userItems = await getAllAccounts();
     res.json({
@@ -76,4 +76,4 @@ router.get("/account", async (req, res) => {
   }
 });
 
-export default router;
+export default lockceptRouter;
