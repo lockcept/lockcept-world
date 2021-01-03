@@ -47,6 +47,6 @@ passport.use(
 /**
  *  after of this router, authenticated users can only access
  */
-authRouter.use("/", passport.authenticate("jwt", { session: false }));
+export const jwtUserAuth = passport.authenticate("jwt", { session: false });
 
 export default authRouter;
