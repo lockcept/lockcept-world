@@ -17,7 +17,8 @@ import {
 } from "@lockcept/shared";
 import { useLockceptContext } from "../../contexts";
 import { errorLogger } from "../../logger";
-import { AlertSnackbar, Copyright } from "../../components";
+import Copyright from "../../components/Copyright";
+import AlertSnackbar from "../../components/AlertSnackbar";
 
 const useStyles = makeStyles((theme) => ({
   paper: {

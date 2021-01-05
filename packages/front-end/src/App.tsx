@@ -4,9 +4,9 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import { ThemeProvider } from "@material-ui/core/styles";
 import { CssBaseline } from "@material-ui/core";
-import Signup from "./routes/auth/signup";
-import MainRouter from "./routes/main";
-import Signin from "./routes/auth/signin";
+import MainRouter from "./containers/main/MainRouter";
+import Signin from "./containers/auth/Signin";
+import Signup from "./containers/auth/Signup";
 import { LockceptContextProvider } from "./contexts";
 
 const theme = createMuiTheme({

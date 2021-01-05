@@ -1,1 +1,1 @@
-export * from "./lockcept-context";
+export * from "./LockceptContext";

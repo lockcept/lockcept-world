@@ -3,16 +3,15 @@ import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import Box from "@material-ui/core/Box";
-import List from "@material-ui/core/List";
 import IconButton from "@material-ui/core/IconButton";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
-import { mainListItems } from "./items";
-import { Copyright } from "../../components";
-import DashboardPage from "./dashboard-page";
+import AccountDashboardItems from "./AccountDashboardItems";
+import DashboardPage from "./DashboardPage";
+import Copyright from "../../components/Copyright";
 
 const drawerWidth = 240;
 
@@ -95,7 +94,7 @@ const Dashboard = () => {
             </IconButton>
           )}
         </div>
-        <List>{mainListItems}</List>
+        <AccountDashboardItems />
       </Drawer>
       <main className={classes.content}>
         <Container maxWidth="lg" className={classes.container}>

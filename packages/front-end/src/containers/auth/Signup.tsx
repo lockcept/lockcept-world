@@ -18,7 +18,8 @@ import Avatar from "@material-ui/core/Avatar";
 import { useHistory } from "react-router-dom";
 import { errorLogger } from "../../logger";
 import { useLockceptContext } from "../../contexts";
-import { AlertSnackbar, Copyright } from "../../components";
+import AlertSnackbar from "../../components/AlertSnackbar";
+import Copyright from "../../components/Copyright";
 
 const useStyles = makeStyles((theme) => ({
   paper: {

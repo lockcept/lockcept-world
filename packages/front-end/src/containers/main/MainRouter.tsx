@@ -1,10 +1,10 @@
 import React from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { Box } from "@material-ui/core";
-import MainFooter from "./main-footer";
-import MainHeader from "./main-header";
-import Main from "./main";
-import Dashboard from "../account/dashboard";
+import MainFooter from "./MainFooter";
+import MainHeader from "./MainHeader";
+import Main from "./Main";
+import Dashboard from "../account/AccountDashboard";
 
 const MainRouter = () => {
   return (

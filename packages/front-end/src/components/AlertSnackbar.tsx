@@ -14,12 +14,7 @@ const Alert = (props: AlertProps) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 };
 
-export const AlertSnackbar = ({
-  children,
-  state,
-  setState,
-  severity,
-}: Props) => {
+const AlertSnackbar = ({ children, state, setState, severity }: Props) => {
   return (
     <Snackbar
       anchorOrigin={{
@@ -43,3 +38,5 @@ export const AlertSnackbar = ({
     </Snackbar>
   );
 };
+
+export default AlertSnackbar;
