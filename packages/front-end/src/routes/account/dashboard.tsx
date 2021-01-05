@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import Box from "@material-ui/core/Box";
 import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
 import { mainListItems } from "./items";
 import { Copyright } from "../../components";
+import DashboardPage from "./dashboard-page";
 
 const drawerWidth = 240;
 
@@ -27,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
   drawerPaper: {
     position: "relative",
+    top: "5px",
     whiteSpace: "nowrap",
     width: drawerWidth,
     transition: theme.transitions.create("width", {
@@ -41,9 +43,6 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.leavingScreen,
     }),
     width: theme.spacing(7),
-    [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(9),
-    },
   },
   content: {
     flexGrow: 1,
@@ -67,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Dashboard = () => {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -96,13 +95,28 @@ const Dashboard = () => {
             </IconButton>
           )}
         </div>
-        <Divider />
         <List>{mainListItems}</List>
-        <Divider />
       </Drawer>
       <main className={classes.content}>
         <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3} />
+          <Grid container spacing={3}>
+            <HashRouter hashType="noslash">
+              <Switch>
+                <Route exact path="/">
+                  <DashboardPage />
+                </Route>
+                <Route exact path="/users">
+                  users
+                </Route>
+                <Route exact path="/accounts">
+                  accounts
+                </Route>
+                <Route>
+                  <Redirect to="/" />
+                </Route>
+              </Switch>
+            </HashRouter>
+          </Grid>
           <Box pt={4}>
             <Copyright />
           </Box>
