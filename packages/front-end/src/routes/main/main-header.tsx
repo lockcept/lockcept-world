@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   createStyles,
+  Link,
   makeStyles,
   Toolbar,
   Typography,
@@ -37,7 +38,9 @@ const MainHeader = () => {
       <AppBar color="primary" position="static">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
-            Lockcept World
+            <Link underline="none" color="textPrimary" href="/">
+              Lockcept World
+            </Link>
           </Typography>
           {!signed && (
             <Button
