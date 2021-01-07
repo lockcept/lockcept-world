@@ -44,7 +44,16 @@
       {
         "argsIgnorePattern": "^_"
       }
+    ],
+    "import/order": [
+      "error",
+        {
+          "alphabetize": {
+          "order": "asc"
+        }
+      }
     ]
+
   },
   "settings": {
     "import/core-modules": ["aws-sdk"],
