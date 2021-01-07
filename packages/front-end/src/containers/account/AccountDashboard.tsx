@@ -1,17 +1,19 @@
-import React, { useState } from "react";
-import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
 import Box from "@material-ui/core/Box";
-import IconButton from "@material-ui/core/IconButton";
 import Container from "@material-ui/core/Container";
+import Drawer from "@material-ui/core/Drawer";
 import Grid from "@material-ui/core/Grid";
+import IconButton from "@material-ui/core/IconButton";
+import { makeStyles } from "@material-ui/core/styles";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import clsx from "clsx";
+import React, { useState } from "react";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
+import Copyright from "../../components/Copyright";
 import AccountDashboardItems from "./AccountDashboardItems";
 import DashboardPage from "./DashboardPage";
-import Copyright from "../../components/Copyright";
+import ProfilesSettingPage from "./ProfilesSettingPage";
+import UsersSettingPage from "./UsersSettingPage";
 
 const drawerWidth = 240;
 
@@ -105,10 +107,10 @@ const Dashboard = () => {
                   <DashboardPage />
                 </Route>
                 <Route exact path="/users">
-                  users
+                  <UsersSettingPage />
                 </Route>
-                <Route exact path="/accounts">
-                  accounts
+                <Route exact path="/profiles">
+                  <ProfilesSettingPage />
                 </Route>
                 <Route>
                   <Redirect to="/" />

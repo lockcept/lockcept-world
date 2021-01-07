@@ -1,11 +1,11 @@
-import React from "react";
+import { Link, List } from "@material-ui/core";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import DashboardIcon from "@material-ui/icons/Dashboard";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import DashboardIcon from "@material-ui/icons/Dashboard";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
-import { Link, List } from "@material-ui/core";
+import React from "react";
 
 const AccountDashboardItems = () => {
   return (
@@ -22,7 +22,7 @@ const AccountDashboardItems = () => {
         </ListItemIcon>
         <ListItemText primary="Users & Accounts" />
       </ListItem>
-      <ListItem button component={Link} href="#accounts" color="textPrimary">
+      <ListItem button component={Link} href="#profiles" color="textPrimary">
         <ListItemIcon>
           <AccountCircleIcon />
         </ListItemIcon>
