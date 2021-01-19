@@ -1,5 +1,5 @@
 import Axios, { AxiosInstance } from "axios";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 
 const getHttpEndPoints = () => {
   const httpEndPoints = {
@@ -43,9 +43,16 @@ interface Props {
 }
 
 export const LockceptContextProvider = ({ children }: Props): JSX.Element => {
-  const { instance } = useLockceptContext();
   const [signed, setSigned] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string>("");
+  const instance = useMemo(
+    () =>
+      Axios.create({
+        baseURL: getHttpEndPoints(),
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }),
+    [accessToken]
+  );
   const value = {
     instance,
     signed,

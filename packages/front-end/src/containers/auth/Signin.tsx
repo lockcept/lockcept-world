@@ -1,24 +1,24 @@
-import React, { useCallback, useState } from "react";
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Link from "@material-ui/core/Link";
-import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import { useHistory } from "react-router-dom";
 import {
   ErrorName,
   SigninLocalRequest,
   SigninLocalResponse,
 } from "@lockcept/shared";
+import Avatar from "@material-ui/core/Avatar";
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+import Link from "@material-ui/core/Link";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import React, { useCallback, useState } from "react";
+import { useHistory } from "react-router-dom";
+import AlertSnackbar from "../../components/AlertSnackbar";
+import Copyright from "../../components/Copyright";
 import { useLockceptContext } from "../../contexts";
 import { errorLogger } from "../../logger";
-import Copyright from "../../components/Copyright";
-import AlertSnackbar from "../../components/AlertSnackbar";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -50,14 +50,20 @@ const Signin = () => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputEmail = event.target.value;
-    setEmail(inputEmail);
-  };
-  const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputPassword = event.target.value;
-    setPassword(inputPassword);
-  };
+  const onEmailChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const inputEmail = event.target.value;
+      setEmail(inputEmail);
+    },
+    []
+  );
+  const onPasswordChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const inputPassword = event.target.value;
+      setPassword(inputPassword);
+    },
+    []
+  );
   const handleSignin = useCallback(async () => {
     if (signed) return;
     setLoading(true);
@@ -70,6 +76,7 @@ const Signin = () => {
       const { token } = res.data;
       setAccessToken(token);
       setSigned(true);
+      setLoading(false);
       history.push("/");
     } catch (e) {
       errorLogger(e);
@@ -89,9 +96,9 @@ const Signin = () => {
             setErrorMessage(e.response.message ?? "Unknown Error");
         }
       }
+      setLoading(false);
       setSigninError(true);
     }
-    setLoading(false);
   }, [email, history, instance, password, setAccessToken, setSigned, signed]);
 
   return (
