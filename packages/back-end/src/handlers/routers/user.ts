@@ -1,7 +1,8 @@
+import { UserDataResponse } from "@lockcept/shared";
 import express from "express";
 import { omit } from "lodash";
-import User from "../../models/user";
 import { errorLogger } from "../../logger";
+import User from "../../models/user";
 
 const router = express.Router();
 
@@ -59,8 +60,11 @@ router.get("/users/:userId", async (req, res) => {
     const user = req.user as User;
     if (user.data.id !== id) {
       res.sendStatus(403);
+      return;
     }
-    const userResponseData = omit(user.data, "password", "id");
+    const userResponseData: UserDataResponse = {
+      userData: omit(user.data, "password", "id"),
+    };
     res.status(200).json(userResponseData);
   } catch (e) {
     errorLogger("Failed to get userData", { id });

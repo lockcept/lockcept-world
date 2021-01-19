@@ -1,13 +1,14 @@
 import {
   AccountData,
+  AccountDataResponse,
   CreateAccountRequest,
   validateAccountData,
 } from "@lockcept/shared";
 import express from "express";
 import { isNil } from "lodash";
+import { errorLogger } from "../../logger";
 import Account from "../../models/account";
 import User from "../../models/user";
-import { errorLogger } from "../../logger";
 
 const router = express.Router();
 
@@ -48,6 +49,29 @@ router.patch("/users/:userId", async (req, res) => {
     res.sendStatus(200);
   } catch (e) {
     errorLogger("Failed to update account", { userId, accountData });
+    errorLogger(e);
+    res.sendStatus(500);
+  }
+});
+
+router.get("/users/:userId", async (req, res) => {
+  const { userId: id } = req.params;
+  try {
+    const user = req.user as User;
+    if (user.data.id !== id) {
+      res.sendStatus(403);
+      return;
+    }
+    const account = await Account.get(id);
+    if (isNil(account)) {
+      res.sendStatus(404);
+      return;
+    }
+    const { data: accountData } = account;
+    const accountResponseData: AccountDataResponse = { accountData };
+    res.status(200).json(accountResponseData);
+  } catch (e) {
+    errorLogger("Failed to get accountData", { id });
     errorLogger(e);
     res.sendStatus(500);
   }

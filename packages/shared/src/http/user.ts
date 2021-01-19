@@ -12,3 +12,7 @@ export interface SigninLocalRequest {
 export interface SigninLocalResponse {
   token: string;
 }
+
+export interface UserDataResponse {
+  userData: Omit<UserData, "password" | "id">;
+}
