@@ -14,6 +14,7 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import queryString from "query-string";
 import React, { useCallback, useState } from "react";
 import { useHistory } from "react-router-dom";
 import AlertSnackbar from "../../components/AlertSnackbar";
@@ -51,6 +52,8 @@ const Signin = () => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
+  const query = queryString.parse(history.location.search);
+
   const onEmailChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const inputEmail = event.target.value;
@@ -73,6 +76,10 @@ const Signin = () => {
       return;
     }
     setLoading(true);
+
+    let goto = query?.goto;
+    if (!goto || typeof goto !== "string") goto = "/";
+
     try {
       const reqBody: SigninLocalRequest = { email, password };
       const res = await instance.post<SigninLocalResponse>(
@@ -83,7 +90,7 @@ const Signin = () => {
       setAccessToken(token);
       setSigned(true);
       setLoading(false);
-      history.push("/");
+      history.push(goto);
     } catch (e) {
       errorLogger(e);
       setAccessToken("");
@@ -105,7 +112,16 @@ const Signin = () => {
       setLoading(false);
       setSigninError(true);
     }
-  }, [email, history, instance, password, setAccessToken, setSigned, signed]);
+  }, [
+    email,
+    history,
+    instance,
+    password,
+    setAccessToken,
+    setSigned,
+    signed,
+    query,
+  ]);
 
   return (
     <Container component="main" maxWidth="xs">

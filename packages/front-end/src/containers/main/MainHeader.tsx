@@ -42,7 +42,12 @@ const MainHeader = () => {
             <Button
               color="inherit"
               onClick={() => {
-                history.push("/signin");
+                history.push({
+                  pathname: "/signin",
+                  search: `?goto=${encodeURI(
+                    history.location.pathname + history.location.hash
+                  )}`,
+                });
               }}
             >
               Sign-in
