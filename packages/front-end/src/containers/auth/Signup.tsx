@@ -1,4 +1,3 @@
-import React, { useCallback, useMemo, useState } from "react";
 import {
   ErrorName,
   SignupLocalRequest,
@@ -6,20 +5,21 @@ import {
   validatePassword,
   validateUserName,
 } from "@lockcept/shared";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Link from "@material-ui/core/Link";
-import Grid from "@material-ui/core/Grid";
+import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+import Link from "@material-ui/core/Link";
+import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import Avatar from "@material-ui/core/Avatar";
+import React, { useCallback, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { errorLogger } from "../../logger";
-import { useLockceptContext } from "../../contexts";
 import AlertSnackbar from "../../components/AlertSnackbar";
 import Copyright from "../../components/Copyright";
+import { useLockceptContext } from "../../contexts";
+import { errorLogger } from "../../logger";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -68,6 +68,7 @@ const Signup = () => {
         userData: { email, password: currentPassword, userName },
       };
       await instance.post("/signup/local", req);
+      setLoading(false);
       history.push("/");
     } catch (e) {
       errorLogger(e);
@@ -86,8 +87,8 @@ const Signup = () => {
         }
       }
       setSubmitError(true);
+      setLoading(false);
     }
-    setLoading(false);
   }, [loading, passwords, email, userName, instance, history]);
 
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
