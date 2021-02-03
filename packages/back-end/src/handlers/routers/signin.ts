@@ -1,8 +1,3 @@
-import express from "express";
-import passport from "passport";
-import jwt from "jsonwebtoken";
-import { Strategy as LocalStrategy } from "passport-local";
-import { omit } from "lodash";
 import {
   ErrorName,
   SigninLocalRequest,
@@ -10,10 +5,15 @@ import {
   validateEmail,
   validatePassword,
 } from "@lockcept/shared";
-import User from "../../models/user";
+import express from "express";
+import jwt from "jsonwebtoken";
+import { omit } from "lodash";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import { config } from "../../config";
 import { compareHash, CustomError } from "../../helpers";
 import { errorLogger } from "../../logger";
-import { config } from "../../config";
+import User from "../../models/user";
 
 /**
  * router for signin
@@ -66,8 +66,17 @@ passport.use(
 
 signinRouter.post("/local", (req, res, next) => {
   const { email, password } = req.body as SigninLocalRequest;
-  if (!validateEmail(email) || !validatePassword(password)) {
+  if (!validateEmail(email)) {
     res.sendStatus(400);
+    return;
+  }
+  if (!validatePassword(password)) {
+    res.status(403).json(
+      new CustomError("Invalid password", {
+        name: ErrorName.InvalidPassword,
+        statusCode: 403,
+      })
+    );
     return;
   }
 

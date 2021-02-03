@@ -2,6 +2,7 @@ import {
   ErrorName,
   SigninLocalRequest,
   SigninLocalResponse,
+  validateEmail,
 } from "@lockcept/shared";
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
@@ -66,6 +67,11 @@ const Signin = () => {
   );
   const handleSignin = useCallback(async () => {
     if (signed) return;
+    if (!validateEmail(email)) {
+      setErrorMessage("Please enter a valid email address.");
+      setSigninError(true);
+      return;
+    }
     setLoading(true);
     try {
       const reqBody: SigninLocalRequest = { email, password };
