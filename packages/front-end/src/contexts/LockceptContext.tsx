@@ -1,4 +1,6 @@
+import { UserData } from "@lockcept/shared";
 import Axios, { AxiosInstance } from "axios";
+import jwt from "jsonwebtoken";
 import React, { createContext, useContext, useMemo, useState } from "react";
 
 const getHttpEndPoints = () => {
@@ -25,6 +27,7 @@ export interface LockceptContextProps {
   setSigned: (signed: boolean) => void;
   accessToken: string;
   setAccessToken: (accessToken: string) => void;
+  signedUserData: Omit<UserData, "password"> | null;
 }
 const LockceptContext = createContext<LockceptContextProps>({
   instance: Axios.create({
@@ -34,6 +37,7 @@ const LockceptContext = createContext<LockceptContextProps>({
   setSigned: () => {},
   accessToken: "",
   setAccessToken: () => {},
+  signedUserData: null,
 });
 
 export const useLockceptContext = () => useContext(LockceptContext);
@@ -53,12 +57,22 @@ export const LockceptContextProvider = ({ children }: Props): JSX.Element => {
       }),
     [accessToken]
   );
+
+  const signedUserData: UserData | null = useMemo(() => {
+    if (!accessToken) return null;
+    const decoded = jwt.decode(accessToken);
+    if (!decoded) return null;
+    if (typeof decoded === "string") return null;
+    return decoded as UserData;
+  }, [accessToken]);
+
   const value = {
     instance,
     signed,
     setSigned,
     accessToken,
     setAccessToken,
+    signedUserData,
   };
   return (
     <LockceptContext.Provider value={value}>

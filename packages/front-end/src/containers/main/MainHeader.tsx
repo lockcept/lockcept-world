@@ -1,5 +1,3 @@
-import React, { useMemo } from "react";
-import jwt from "jsonwebtoken";
 import {
   AppBar,
   Box,
@@ -10,6 +8,7 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core";
+import React, { useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import { useLockceptContext } from "../../contexts";
 
@@ -25,14 +24,11 @@ const MainHeader = () => {
   const classes = useStyles();
   const history = useHistory();
 
-  const { signed, accessToken } = useLockceptContext();
+  const { signed, signedUserData } = useLockceptContext();
   const userName = useMemo(() => {
-    const decoded = jwt.decode(accessToken);
-    if (!decoded) return "";
-    if (typeof decoded === "string") return "";
-    const { userName: decodedUserName } = decoded;
-    return decodedUserName;
-  }, [accessToken]);
+    if (!signedUserData) return "";
+    return signedUserData?.userName;
+  }, [signedUserData]);
   return (
     <Box id="toolbar">
       <AppBar color="primary" position="static">
