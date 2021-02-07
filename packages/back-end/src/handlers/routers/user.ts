@@ -1,23 +1,40 @@
-import { UserDataResponse } from "@lockcept/shared";
+import {
+  SigninLocalResponse,
+  UpdateEmailRequest,
+  UserDataResponse,
+} from "@lockcept/shared";
 import express from "express";
+import jwt from "jsonwebtoken";
 import { omit } from "lodash";
+import { config } from "../../config";
 import { errorLogger } from "../../logger";
 import User from "../../models/user";
 
 const router = express.Router();
 
-router.patch("/users/:userId/emails/:email", async (req, res) => {
-  const { userId: id, email } = req.params;
+const jwtKey = config.key.JWT_USER;
+
+router.post("/users/:userId/email", async (req, res) => {
+  const { userId: id } = req.params;
+  const { email } = req.body as UpdateEmailRequest;
   try {
     const user = req.user as User;
     if (user.data.id !== id) {
       res.sendStatus(403);
     }
     await user.setEmail(email);
-    res.sendStatus(200);
+    const token = jwt.sign(omit({ ...user.data, email }, "password"), jwtKey, {
+      expiresIn: "1d",
+    });
+    const resBody: SigninLocalResponse = { token };
+    res.json(resBody);
   } catch (e) {
     errorLogger("Failed to set email", { id, email });
     errorLogger(e);
+    if (e?.options?.name) {
+      const statusCode = e?.options?.statusCode ?? 500;
+      res.status(statusCode).json(e);
+    }
     res.sendStatus(500);
   }
 });

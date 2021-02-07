@@ -154,6 +154,71 @@ class User {
   };
 
   /**
+   * Returns existance of email
+   * @param rawEmail
+   */
+  static ifEmailExists = async (rawEmail: string): Promise<boolean> => {
+    const email = rawEmail.toLowerCase();
+    try {
+      const { Item: user } = await dynamodb
+        .get({
+          TableName: uniqueEmailTable,
+          Key: { email },
+        })
+        .promise();
+      if (user) return true;
+      return false;
+    } catch (e) {
+      errorLogger("Failed to check email existance", { email });
+      throw e;
+    }
+  };
+
+  /**
+   * Returns existance of userName
+   * @param rawUserName
+   */
+  static ifUserNameExists = async (rawUserName: string): Promise<boolean> => {
+    const userName = rawUserName.toLowerCase();
+    try {
+      const { Item: user } = await dynamodb
+        .get({
+          TableName: uniqueUserNameTable,
+          Key: { userName },
+        })
+        .promise();
+      if (user) return true;
+      return false;
+    } catch (e) {
+      errorLogger("Failed to check userName existance", { userName });
+      throw e;
+    }
+  };
+
+  /**
+   * Returns an user with email
+   * @param email email to find user with
+   */
+  static findOneByEmail = async (rawEmail: string): Promise<User | null> => {
+    const email = rawEmail.toLowerCase();
+    try {
+      const userItems = await queryAll({
+        TableName: userTable,
+        IndexName: "EmailIndex",
+        ...generateKeyConditionParams({ email }),
+      });
+
+      if (isEmpty(userItems)) return null;
+      const userData = userItems[0] as UserData;
+      if (!userData) throw Error();
+      return new User(userData);
+    } catch (e) {
+      errorLogger("Failed at findOneByEmail", { email });
+      throw e;
+    }
+  };
+
+  /**
    * Updates email with uniqueness checking
    * @param email email to update
    */
@@ -188,7 +253,10 @@ class User {
 
     if (!validateEmail(email)) {
       errorLogger("Invalid email at setEmail", { email });
-      return;
+      throw new CustomError("Invalid Email", {
+        name: ErrorName.InvalidEmail,
+        statusCode: 400,
+      });
     }
 
     // register new email
@@ -221,6 +289,12 @@ class User {
         .promise();
     } catch (e) {
       errorLogger("Failed to register new email at setEmail", emailItem);
+      const isEmailExists = await User.ifEmailExists(email);
+      if (isEmailExists)
+        throw new CustomError("conflict user data: email", {
+          name: ErrorName.ExistingEmail,
+          statusCode: 409,
+        });
       throw e;
     }
 
@@ -357,71 +431,6 @@ class User {
         errorLogger("User id does not exist at setPassword", { id });
         throw Error();
       }
-      throw e;
-    }
-  };
-
-  /**
-   * Returns existance of email
-   * @param rawEmail
-   */
-  static ifEmailExists = async (rawEmail: string): Promise<boolean> => {
-    const email = rawEmail.toLowerCase();
-    try {
-      const { Item: user } = await dynamodb
-        .get({
-          TableName: uniqueEmailTable,
-          Key: { email },
-        })
-        .promise();
-      if (user) return true;
-      return false;
-    } catch (e) {
-      errorLogger("Failed to check email existance", { email });
-      throw e;
-    }
-  };
-
-  /**
-   * Returns existance of userName
-   * @param rawUserName
-   */
-  static ifUserNameExists = async (rawUserName: string): Promise<boolean> => {
-    const userName = rawUserName.toLowerCase();
-    try {
-      const { Item: user } = await dynamodb
-        .get({
-          TableName: uniqueUserNameTable,
-          Key: { userName },
-        })
-        .promise();
-      if (user) return true;
-      return false;
-    } catch (e) {
-      errorLogger("Failed to check userName existance", { userName });
-      throw e;
-    }
-  };
-
-  /**
-   * Returns an user with email
-   * @param email email to find user with
-   */
-  static findOneByEmail = async (rawEmail: string): Promise<User | null> => {
-    const email = rawEmail.toLowerCase();
-    try {
-      const userItems = await queryAll({
-        TableName: userTable,
-        IndexName: "EmailIndex",
-        ...generateKeyConditionParams({ email }),
-      });
-
-      if (isEmpty(userItems)) return null;
-      const userData = userItems[0] as UserData;
-      if (!userData) throw Error();
-      return new User(userData);
-    } catch (e) {
-      errorLogger("Failed at findOneByEmail", { email });
       throw e;
     }
   };
