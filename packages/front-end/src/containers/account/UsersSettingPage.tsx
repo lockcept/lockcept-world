@@ -2,9 +2,11 @@ import {
   ErrorName,
   SigninLocalResponse,
   UpdateEmailRequest,
+  UpdateUserNameRequest,
   UserData,
   UserDataResponse,
   validateEmail,
+  validateUserName,
 } from "@lockcept/shared";
 import {
   Box,
@@ -19,7 +21,6 @@ import {
 } from "@material-ui/core";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import AlertSnackbar from "../../components/AlertSnackbar";
 
 import { useLockceptContext } from "../../contexts";
 import { errorLogger } from "../../logger";
@@ -44,8 +45,6 @@ const UserSettingPage = () => {
     "id" | "password"
   > | null>(null);
 
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [submitError, setSubmitError] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -107,15 +106,20 @@ const UserSettingPage = () => {
         const errorName = errorData?.options?.name;
         switch (errorName) {
           case ErrorName.ExistingEmail:
-            setErrorMessage("Email Already Exists");
+            setSnackbar({ severity: "error" }, "Email Already Exists");
             break;
           case ErrorName.InvalidEmail:
-            setErrorMessage("Please enter a valid email address.");
+            setSnackbar(
+              { severity: "error" },
+              "Please enter a valid email address."
+            );
             break;
           default:
-            setErrorMessage(e.response.message ?? "Unknown Error");
+            setSnackbar(
+              { severity: "error" },
+              e.response.message ?? "Unknown Error"
+            );
         }
-        setSubmitError(true);
       }
       setLoading(false);
     }
@@ -125,21 +129,63 @@ const UserSettingPage = () => {
     console.log(userData);
   }, [userData]);
 
-  const handleUserNameUpdate = useCallback(() => {
-    console.log(userData?.userName);
-  }, [userData]);
+  const handleUserNameUpdate = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const req: UpdateUserNameRequest = {
+        userName,
+      };
+      const res = await instance.post<SigninLocalResponse>(
+        `/user/users/${userId}/userName`,
+        req
+      );
+      const { token } = res.data;
+      setAccessToken(token);
+      setLoading(false);
+      setUserName(userName);
+      setSnackbar({ severity: "info" }, "Success to Update UserName");
+    } catch (e) {
+      errorLogger(e);
+      if (e.response) {
+        const errorData = e.response.data;
+        const errorName = errorData?.options?.name;
+        switch (errorName) {
+          case ErrorName.ExistingUserName:
+            setSnackbar({ severity: "error" }, "UserName Already Exists");
+            break;
+          case ErrorName.InvalidUserName:
+            setSnackbar(
+              { severity: "error" },
+              "Please enter a valid user name."
+            );
+            break;
+          default:
+            setSnackbar(
+              { severity: "error" },
+              e.response.message ?? "Unknown Error"
+            );
+        }
+      }
+      setLoading(false);
+    }
+  }, [instance, loading, setAccessToken, setSnackbar, userId, userName]);
 
   const emailValidation = useMemo(() => {
     if (email === "" || validateEmail(email)) return "";
     return "Please enter a valid email address.";
   }, [email]);
+  const userNameValidation = useMemo(() => {
+    if (userName === "" || validateUserName(userName)) return "";
+    return "Please enter a valid user name.";
+  }, [userName]);
 
   return (
     <Container maxWidth="lg">
       <Card className={classes.card}>
         <Toolbar>
           <Typography variant="subtitle1" color="textSecondary">
-            User
+            Update Email
           </Typography>
           <Box flex={1} />
         </Toolbar>
@@ -150,7 +196,7 @@ const UserSettingPage = () => {
                 variant="outlined"
                 fullWidth
                 id="email"
-                label="Update Email Address"
+                label="Email Address"
                 name="email"
                 value={email}
                 error={emailValidation.length > 0}
@@ -162,20 +208,54 @@ const UserSettingPage = () => {
             </Box>
             <IconButton
               onClick={handleEmailUpdate}
-              disabled={emailValidation.length > 0 || !email}
+              disabled={
+                emailValidation.length > 0 ||
+                !email ||
+                email === userData?.email
+              }
             >
               <ChevronRightIcon />
             </IconButton>
           </Box>
         </CardContent>
       </Card>
-      <AlertSnackbar
-        state={submitError}
-        setState={setSubmitError}
-        severity="error"
-      >
-        {errorMessage}
-      </AlertSnackbar>
+      <Card className={classes.card}>
+        <Toolbar>
+          <Typography variant="subtitle1" color="textSecondary">
+            Update UserName
+          </Typography>
+          <Box flex={1} />
+        </Toolbar>
+        <CardContent>
+          <Box display="flex">
+            <Box flexGrow={1}>
+              <TextField
+                variant="outlined"
+                fullWidth
+                id="user-name"
+                label="User Name"
+                name="user-name"
+                value={userName}
+                error={userNameValidation.length > 0}
+                helperText={userNameValidation}
+                onChange={(e) => {
+                  setUserName(e.target.value);
+                }}
+              />
+            </Box>
+            <IconButton
+              onClick={handleUserNameUpdate}
+              disabled={
+                userNameValidation.length > 0 ||
+                !userName ||
+                userName === userData?.userName
+              }
+            >
+              <ChevronRightIcon />
+            </IconButton>
+          </Box>
+        </CardContent>
+      </Card>
     </Container>
   );
 };

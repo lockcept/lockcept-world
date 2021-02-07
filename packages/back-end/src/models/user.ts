@@ -388,6 +388,12 @@ class User {
         "Failed to register new userName at setUserName",
         userNameItem
       );
+      const isUserNameExists = await User.ifUserNameExists(userName);
+      if (isUserNameExists)
+        throw new CustomError("conflict user data: userName", {
+          name: ErrorName.ExistingUserName,
+          statusCode: 409,
+        });
       throw e;
     }
 

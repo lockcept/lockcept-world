@@ -1,6 +1,7 @@
 import {
   SigninLocalResponse,
   UpdateEmailRequest,
+  UpdateUserNameRequest,
   UserDataResponse,
 } from "@lockcept/shared";
 import express from "express";
@@ -55,18 +56,31 @@ router.patch("/users/:userId/passwords/:password", async (req, res) => {
   }
 });
 
-router.patch("/users/:userId/usernames/:username", async (req, res) => {
-  const { userId: id, userName } = req.params;
+router.post("/users/:userId/username/", async (req, res) => {
+  const { userId: id } = req.params;
+  const { userName } = req.body as UpdateUserNameRequest;
   try {
     const user = req.user as User;
     if (user.data.id !== id) {
       res.sendStatus(403);
     }
     await user.setUserName(userName);
-    res.sendStatus(200);
+    const token = jwt.sign(
+      omit({ ...user.data, userName }, "password"),
+      jwtKey,
+      {
+        expiresIn: "1d",
+      }
+    );
+    const resBody: SigninLocalResponse = { token };
+    res.json(resBody);
   } catch (e) {
     errorLogger("Failed to set userName", { id, userName });
     errorLogger(e);
+    if (e?.options?.name) {
+      const statusCode = e?.options?.statusCode ?? 500;
+      res.status(statusCode).json(e);
+    }
     res.sendStatus(500);
   }
 });
