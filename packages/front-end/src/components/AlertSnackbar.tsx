@@ -1,12 +1,15 @@
-import React from "react";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert, { AlertProps, Color } from "@material-ui/lab/Alert";
+import React from "react";
 
-interface Props {
-  children: any;
+export interface CustomSnackbarProps {
+  severity: Color;
+}
+
+interface Props extends CustomSnackbarProps {
   state: boolean;
   setState: (state: boolean) => void;
-  severity: Color;
+  children: any;
 }
 
 const Alert = (props: AlertProps) => {

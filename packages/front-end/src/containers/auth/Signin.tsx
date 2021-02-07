@@ -17,7 +17,6 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import queryString from "query-string";
 import React, { useCallback, useState } from "react";
 import { useHistory } from "react-router-dom";
-import AlertSnackbar from "../../components/AlertSnackbar";
 import Copyright from "../../components/Copyright";
 import { useLockceptContext } from "../../contexts";
 import { errorLogger } from "../../logger";
@@ -45,11 +44,15 @@ const useStyles = makeStyles((theme) => ({
 const Signin = () => {
   const classes = useStyles();
   const history = useHistory();
-  const { instance, signed, setSigned, setAccessToken } = useLockceptContext();
+  const {
+    instance,
+    signed,
+    setSigned,
+    setAccessToken,
+    setSnackbar,
+  } = useLockceptContext();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [signinError, setSigninError] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const query = queryString.parse(history.location.search);
@@ -71,8 +74,7 @@ const Signin = () => {
   const handleSignin = useCallback(async () => {
     if (signed) return;
     if (!validateEmail(email)) {
-      setErrorMessage("Please enter a valid email address.");
-      setSigninError(true);
+      setSnackbar({ severity: "error" }, "Please enter a valid email address.");
       return;
     }
     setLoading(true);
@@ -100,27 +102,30 @@ const Signin = () => {
         const errorName = errorData?.options?.name;
         switch (errorName) {
           case ErrorName.InvalidEmail:
-            setErrorMessage("Email Not Exists");
+            setSnackbar({ severity: "error" }, "Email Not Exists");
             break;
           case ErrorName.InvalidPassword:
-            setErrorMessage("Incorrect Password");
+            setSnackbar({ severity: "error" }, "Incorrect Password");
             break;
           default:
-            setErrorMessage(e.response.message ?? "Unknown Error");
+            setSnackbar(
+              { severity: "error" },
+              e.response.message ?? "Unknown Error"
+            );
         }
       }
       setLoading(false);
-      setSigninError(true);
     }
   }, [
+    signed,
     email,
-    history,
-    instance,
+    query?.goto,
     password,
+    instance,
     setAccessToken,
     setSigned,
-    signed,
-    query,
+    history,
+    setSnackbar,
   ]);
 
   return (
@@ -181,13 +186,6 @@ const Signin = () => {
             </Grid>
           </Grid>
         </form>
-        <AlertSnackbar
-          state={signinError}
-          setState={setSigninError}
-          severity="error"
-        >
-          {errorMessage}
-        </AlertSnackbar>
       </div>
       <Box mt={8}>
         <Copyright />

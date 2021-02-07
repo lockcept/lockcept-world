@@ -2,6 +2,9 @@ import { UserData } from "@lockcept/shared";
 import Axios, { AxiosInstance } from "axios";
 import jwt from "jsonwebtoken";
 import React, { createContext, useContext, useMemo, useState } from "react";
+import AlertSnackbar, {
+  CustomSnackbarProps,
+} from "../components/AlertSnackbar";
 
 const getHttpEndPoints = () => {
   const httpEndPoints = {
@@ -28,6 +31,7 @@ export interface LockceptContextProps {
   accessToken: string;
   setAccessToken: (accessToken: string) => void;
   signedUserData: Omit<UserData, "password"> | null;
+  setSnackbar: (props: CustomSnackbarProps, message: string) => void;
 }
 const LockceptContext = createContext<LockceptContextProps>({
   instance: Axios.create({
@@ -38,6 +42,7 @@ const LockceptContext = createContext<LockceptContextProps>({
   accessToken: "",
   setAccessToken: () => {},
   signedUserData: null,
+  setSnackbar: () => {},
 });
 
 export const useLockceptContext = () => useContext(LockceptContext);
@@ -49,6 +54,10 @@ interface Props {
 export const LockceptContextProvider = ({ children }: Props): JSX.Element => {
   const [signed, setSigned] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string>("");
+  const [customSnackbarProps, setCustomSnackbarProps] = useState<
+    (CustomSnackbarProps & { message: string }) | null
+  >();
+  const [snackbarState, setSnackBarState] = useState<boolean>(false);
   const instance = useMemo(
     () =>
       Axios.create({
@@ -66,6 +75,11 @@ export const LockceptContextProvider = ({ children }: Props): JSX.Element => {
     return decoded as UserData;
   }, [accessToken]);
 
+  const setSnackbar = (props: CustomSnackbarProps, message: string) => {
+    setSnackBarState(true);
+    setCustomSnackbarProps({ ...props, message });
+  };
+
   const value = {
     instance,
     signed,
@@ -73,10 +87,20 @@ export const LockceptContextProvider = ({ children }: Props): JSX.Element => {
     accessToken,
     setAccessToken,
     signedUserData,
+    setSnackbar,
   };
   return (
     <LockceptContext.Provider value={value}>
       {children}
+      {customSnackbarProps && snackbarState && (
+        <AlertSnackbar
+          state={snackbarState}
+          setState={setSnackBarState}
+          severity={customSnackbarProps.severity}
+        >
+          {customSnackbarProps.message}
+        </AlertSnackbar>
+      )}
     </LockceptContext.Provider>
   );
 };

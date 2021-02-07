@@ -16,7 +16,6 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import React, { useCallback, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
-import AlertSnackbar from "../../components/AlertSnackbar";
 import Copyright from "../../components/Copyright";
 import { useLockceptContext } from "../../contexts";
 import { errorLogger } from "../../logger";
@@ -44,9 +43,7 @@ const useStyles = makeStyles((theme) => ({
 const Signup = () => {
   const classes = useStyles();
   const history = useHistory();
-  const { instance } = useLockceptContext();
-  const [submitError, setSubmitError] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const { instance, setSnackbar } = useLockceptContext();
   const [loading, setLoading] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [passwords, setPasswords] = useState<{
@@ -77,19 +74,21 @@ const Signup = () => {
         const errorName = errorData?.options?.name;
         switch (errorName) {
           case ErrorName.ExistingEmail:
-            setErrorMessage("Email Already Exists");
+            setSnackbar({ severity: "error" }, "Email Already Exists");
             break;
           case ErrorName.ExistingUserName:
-            setErrorMessage("UserName Already Exists");
+            setSnackbar({ severity: "error" }, "UserName Already Exists");
             break;
           default:
-            setErrorMessage(e.response.message ?? "Unknown Error");
+            setSnackbar(
+              { severity: "error" },
+              e.response.message ?? "Unknown Error"
+            );
         }
       }
-      setSubmitError(true);
       setLoading(false);
     }
-  }, [loading, passwords, email, userName, instance, history]);
+  }, [loading, passwords, email, userName, instance, history, setSnackbar]);
 
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputEmail = event.target.value;
@@ -255,13 +254,6 @@ const Signup = () => {
             </Grid>
           </Grid>
         </form>
-        <AlertSnackbar
-          state={submitError}
-          setState={setSubmitError}
-          severity="error"
-        >
-          {errorMessage}
-        </AlertSnackbar>
       </div>
       <Box mt={5}>
         <Copyright />
