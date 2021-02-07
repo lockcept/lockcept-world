@@ -2,10 +2,12 @@ import {
   ErrorName,
   SigninLocalResponse,
   UpdateEmailRequest,
+  UpdatePasswordRequest,
   UpdateUserNameRequest,
   UserData,
   UserDataResponse,
   validateEmail,
+  validatePassword,
   validateUserName,
 } from "@lockcept/shared";
 import {
@@ -46,6 +48,8 @@ const UserSettingPage = () => {
   > | null>(null);
 
   const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -125,9 +129,43 @@ const UserSettingPage = () => {
     }
   }, [email, instance, loading, setAccessToken, setSnackbar, userId]);
 
-  const handlePasswordUpdate = useCallback(() => {
-    console.log(userData);
-  }, [userData]);
+  const handlePasswordUpdate = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const req: UpdatePasswordRequest = {
+        password,
+      };
+      const res = await instance.post<SigninLocalResponse>(
+        `/user/users/${userId}/password`,
+        req
+      );
+      const { token } = res.data;
+      setAccessToken(token);
+      setLoading(false);
+      setSnackbar({ severity: "info" }, "Success to Update Password");
+    } catch (e) {
+      errorLogger(e);
+      if (e.response) {
+        const errorData = e.response.data;
+        const errorName = errorData?.options?.name;
+        switch (errorName) {
+          case ErrorName.InvalidPassword:
+            setSnackbar(
+              { severity: "error" },
+              "Please enter a valid passworsd."
+            );
+            break;
+          default:
+            setSnackbar(
+              { severity: "error" },
+              e.response.message ?? "Unknown Error"
+            );
+        }
+      }
+      setLoading(false);
+    }
+  }, [instance, loading, password, setAccessToken, setSnackbar, userId]);
 
   const handleUserNameUpdate = useCallback(async () => {
     if (loading) return;
@@ -175,6 +213,14 @@ const UserSettingPage = () => {
     if (email === "" || validateEmail(email)) return "";
     return "Please enter a valid email address.";
   }, [email]);
+  const passwordValidation = useMemo(() => {
+    if (password === "" || validatePassword(password)) return "";
+    return "Your password does not meet the password requirements: alphabet, number, 8-16 length";
+  }, [password]);
+  const confirmPasswordValidation = useMemo(() => {
+    if (password === confirmPassword) return "";
+    return "Your passwords are not equal";
+  }, [password, confirmPassword]);
   const userNameValidation = useMemo(() => {
     if (userName === "" || validateUserName(userName)) return "";
     return "Please enter a valid user name.";
@@ -212,6 +258,60 @@ const UserSettingPage = () => {
                 emailValidation.length > 0 ||
                 !email ||
                 email === userData?.email
+              }
+            >
+              <ChevronRightIcon />
+            </IconButton>
+          </Box>
+        </CardContent>
+      </Card>
+      <Card className={classes.card}>
+        <Toolbar>
+          <Typography variant="subtitle1" color="textSecondary">
+            Update Password
+          </Typography>
+          <Box flex={1} />
+        </Toolbar>
+        <CardContent>
+          <Box display="flex">
+            <Box flex={1} mr={2}>
+              <TextField
+                variant="outlined"
+                fullWidth
+                id="password"
+                type="password"
+                label="Password"
+                name="password"
+                error={passwordValidation.length > 0}
+                helperText={passwordValidation}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
+              />
+            </Box>
+            <Box flex={1}>
+              <TextField
+                variant="outlined"
+                fullWidth
+                id="confirm-password"
+                type="password"
+                label="Confirm Password"
+                name="confirm-password"
+                error={confirmPasswordValidation.length > 0}
+                helperText={confirmPasswordValidation}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                }}
+              />
+            </Box>
+            <IconButton
+              onClick={handlePasswordUpdate}
+              disabled={
+                passwordValidation.length > 0 ||
+                confirmPasswordValidation.length > 0 ||
+                !password ||
+                !confirmPassword ||
+                password !== confirmPassword
               }
             >
               <ChevronRightIcon />

@@ -1,6 +1,7 @@
 import {
   SigninLocalResponse,
   UpdateEmailRequest,
+  UpdatePasswordRequest,
   UpdateUserNameRequest,
   UserDataResponse,
 } from "@lockcept/shared";
@@ -40,18 +41,27 @@ router.post("/users/:userId/email", async (req, res) => {
   }
 });
 
-router.patch("/users/:userId/passwords/:password", async (req, res) => {
-  const { userId: id, password } = req.params;
+router.post("/users/:userId/password", async (req, res) => {
+  const { userId: id } = req.params;
+  const { password } = req.body as UpdatePasswordRequest;
   try {
     const user = req.user as User;
     if (user.data.id !== id) {
       res.sendStatus(403);
     }
     await user.setPassword(password);
-    res.sendStatus(200);
+    const token = jwt.sign(omit({ ...user.data }, "password"), jwtKey, {
+      expiresIn: "1d",
+    });
+    const resBody: SigninLocalResponse = { token };
+    res.json(resBody);
   } catch (e) {
     errorLogger("Failed to set password", { id, password });
     errorLogger(e);
+    if (e?.options?.name) {
+      const statusCode = e?.options?.statusCode ?? 500;
+      res.status(statusCode).json(e);
+    }
     res.sendStatus(500);
   }
 });
