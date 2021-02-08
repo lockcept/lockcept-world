@@ -1,7 +1,8 @@
 import { SignupLocalRequest } from "@lockcept/shared";
 import express from "express";
-import User from "../../models/user";
 import { errorLogger } from "../../logger";
+import Account from "../../models/account";
+import User from "../../models/user";
 
 /**
  * router for signup
@@ -15,7 +16,8 @@ signupRouter.post("/local", async (req, res) => {
   const { userData } = req.body as SignupLocalRequest;
   try {
     const { email, password, userName } = userData;
-    await User.create({ email, password, userName });
+    const user = await User.create({ email, password, userName });
+    await Account.create({ userId: user.id });
     res.sendStatus(200);
   } catch (e) {
     errorLogger("Failed to signup", userData);

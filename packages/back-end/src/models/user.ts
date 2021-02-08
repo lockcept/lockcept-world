@@ -35,7 +35,7 @@ class User {
    * Creates a new user
    * @param data UserData to create a new user
    */
-  static create = async (data: Omit<UserData, "id">): Promise<void> => {
+  static create = async (data: Omit<UserData, "id">): Promise<UserData> => {
     const id = nanoid();
     const { email: rawEmail, password, userName: rawUserName } = data;
     const email = rawEmail.toLowerCase();
@@ -134,6 +134,8 @@ class User {
       }
       throw e;
     }
+
+    return { ...data, id };
   };
 
   /**

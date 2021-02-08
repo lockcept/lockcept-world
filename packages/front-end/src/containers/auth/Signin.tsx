@@ -119,7 +119,7 @@ const Signin = () => {
   }, [
     signed,
     email,
-    query?.goto,
+    query,
     password,
     instance,
     setAccessToken,
