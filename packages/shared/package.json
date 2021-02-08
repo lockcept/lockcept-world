@@ -1,0 +1,15 @@
+{
+  "name": "@lockcept/shared",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.165",
+    "@types/validator": "^13.1.1",
+    "lodash": "^4.17.20",
+    "validator": "^13.5.1"
+  }
+}

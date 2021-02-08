@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@lockcept/shared": "link:./../shared",
     "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -12,8 +15,13 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "axios": "^0.20.0",
+    "clsx": "^1.1.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.20",
+    "query-string": "^6.13.8",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "typescript": "~3.7.2"
   },
@@ -24,7 +32,10 @@
     "eject": "react-scripts eject",
     "build:prod": "REACT_APP_STAGE=prod yarn build",
     "deploy:prod": "yarn build:prod && aws s3 sync build/ s3://lockcept.kr",
-    "postdeploy:prod": "aws cloudfront create-invalidation --distribution-id ESCB8YVB83R2Y --paths \"/*\""
+    "postdeploy:prod": "aws cloudfront create-invalidation --distribution-id ESCB8YVB83R2Y --paths \"/*\"",
+    "build:stg": "REACT_APP_STAGE=stg yarn build",
+    "deploy:stg": "yarn build:stg && aws s3 sync build/ s3://stg.lockcept.kr",
+    "postdeploy:stg": "aws cloudfront create-invalidation --distribution-id E1SMUU2I6PTPF3 --paths \"/*\""
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -40,5 +51,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.0",
+    "@types/lodash": "^4.14.161",
+    "@types/react-router-dom": "^5.1.5"
   }
 }

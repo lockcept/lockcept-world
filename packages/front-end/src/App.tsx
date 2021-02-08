@@ -1,34 +1,51 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
-import Lockcept from "./lockcept";
-import Axios from "axios";
+import { Redirect, Route, Switch } from "react-router-dom";
+import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
+import { ThemeProvider } from "@material-ui/core/styles";
+import { CssBaseline } from "@material-ui/core";
+import MainRouter from "./containers/main/MainRouter";
+import Signin from "./containers/auth/Signin";
+import Signup from "./containers/auth/Signup";
+import { LockceptContextProvider } from "./contexts";
 
-const getHttpEndPoints = () => {
-  const httpEndPoints = {
-    dev: "http://localhost:4000/dev",
-    prod: "https://api.lockcept.kr/prod",
-  };
-  const stage = process.env.REACT_APP_STAGE;
-  console.log(stage);
-  if (!stage) return httpEndPoints.dev;
-  switch (stage) {
-    case "prod":
-      return httpEndPoints.prod;
-    default:
-      return httpEndPoints.dev;
-  }
-};
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: "#5AC0AC",
+    },
+    secondary: {
+      main: "#C06F5A",
+    },
+  },
+});
 
-function App() {
-  const instance = Axios.create({
-    baseURL: getHttpEndPoints(),
-  });
+export const authProvider = React.createContext(null);
+
+const App = () => {
   return (
-    <div>
-      <Lockcept instance={instance}></Lockcept>
-    </div>
+    <>
+      <CssBaseline />
+      <ThemeProvider theme={theme}>
+        <LockceptContextProvider>
+          <Switch>
+            <Route exact path="/signin">
+              <Signin />
+            </Route>
+            <Route exact path="/signup">
+              <Signup />
+            </Route>
+            <Route path="/">
+              <MainRouter />
+            </Route>
+            <Route>
+              <Redirect to="/" />
+            </Route>
+          </Switch>
+        </LockceptContextProvider>
+      </ThemeProvider>
+    </>
   );
-}
+};
 
 export default App;
