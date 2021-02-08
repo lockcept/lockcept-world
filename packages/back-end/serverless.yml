@@ -1,8 +1,8 @@
 service: lockcept-world
 
 plugins:
-  - serverless-plugin-typescript
   - serverless-dynamodb-local
+  - serverless-webpack
   - serverless-offline
   - serverless-domain-manager
 
@@ -15,6 +15,7 @@ custom:
     stage: ${self:provider.stage}
     createRoute53Record: true
   serverless-offline:
+    noPrependStageInUrl: true
     useChildProcesses: true
     httpPort: 4000
   dynamodb:
@@ -22,17 +23,31 @@ custom:
       - dev
     start:
       migrate: true
+  custom:
+    webpack:
+      includeModules: true
+      keepOutputDirectory: true
   tables:
     lockcept-table: ${self:service}-lockcept-table-${self:provider.stage}
+    user-table: ${self:service}-user-table-${self:provider.stage}
+    unique-email-table: ${self:service}-unique-email-table-${self:provider.stage}
+    unique-user-name-table: ${self:service}-unique-user-name-table-${self:provider.stage}
+    account-table: ${self:service}-account-table-${self:provider.stage}
 
 provider:
   name: aws
+  stackTags:
+    project: lockcept.kr
   stage: ${ opt:stage, "dev" }
   region: ap-northeast-2
   runtime: nodejs12.x
   environment:
     STAGE: ${self:provider.stage}
-    LOCKCEPT_TABLE: ${self:custom.tables.lockcept-table}
+    LOCKCEPT_TABLE: ${self:custom.tables.lockcept-table
+    USER_TABLE: ${self:custom.tables.user-table}
+    UNIQUE_EMAIL_TABLE: ${self:custom.tables.unique-email-table}
+    UNIQUE_USER_NAME_TABLE: ${self:custom.tables.unique-user-name-table}
+    ACCOUNT_TABLE: ${self:custom.tables.account-table}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -45,27 +60,15 @@ provider:
       Resource: "*"
 
 functions:
-  hello:
-    handler: handler.hello
+  lockcept:
+    handler: src/handlers/index.handler
     events:
       - http:
           path: /
-          method: any
-          cors: true
-  postLockcept:
-    handler: src/handler/lockcept.post
-    events:
+          method: ANY
       - http:
-          path: /lockcept/{email}
-          method: get
-          cors: true
-  getLockcept:
-    handler: src/handler/lockcept.get
-    events:
-      - http:
-          path: /lockcept
-          method: get
-          cors: true
+          path: /{proxy+}
+          method: ANY
 
 resources:
   Resources:
@@ -79,6 +82,98 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    userTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.tables.user-table}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: EmailIndex
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+    UniqueEmailTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.tables.unique-email-table}
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: IdIndex
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+            Projection:
+              ProjectionType: KEYS_ONLY
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+    UniqueUserNameTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.tables.unique-user-name-table}
+        AttributeDefinitions:
+          - AttributeName: userName
+            AttributeType: S
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userName
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: IdIndex
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+            Projection:
+              ProjectionType: KEYS_ONLY
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+    accountTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.tables.account-table}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1

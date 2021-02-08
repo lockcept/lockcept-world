@@ -1,8 +1,8 @@
 {
-  "name": "lockcept.kr",
+  "name": "lockcept-world",
   "version": "0.1.0",
   "main": "index.js",
-  "repository": "http://github.com/lockcept/lockcept.kr",
+  "repository": "http://github.com/lockcept/lockcept-world",
   "author": "lockcept <lockcept@gmail.com>",
   "license": "MIT",
   "devDependencies": {

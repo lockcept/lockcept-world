@@ -10,7 +10,8 @@
     "plugin:react/recommended",
     "plugin:json/recommended",
     "plugin:yaml/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "prettier/react"
   ],
   "globals": {
     "Atomics": "readonly",
@@ -43,7 +44,16 @@
       {
         "argsIgnorePattern": "^_"
       }
+    ],
+    "import/order": [
+      "error",
+        {
+          "alphabetize": {
+          "order": "asc"
+        }
+      }
     ]
+
   },
   "settings": {
     "import/core-modules": ["aws-sdk"],
