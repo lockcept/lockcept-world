@@ -7,9 +7,16 @@ import { makeStyles } from "@material-ui/core/styles";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import clsx from "clsx";
-import React, { useState } from "react";
-import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  HashRouter,
+  Redirect,
+  Route,
+  Switch,
+  useHistory,
+} from "react-router-dom";
 import Copyright from "../../components/Copyright";
+import { useLockceptContext } from "../../contexts";
 import AccountDashboardItems from "./AccountDashboardItems";
 import DashboardPage from "./DashboardPage";
 import ProfilesSettingPage from "./ProfilesSettingPage";
@@ -68,12 +75,24 @@ const useStyles = makeStyles((theme) => ({
 const Dashboard = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const history = useHistory();
   const handleDrawerOpen = () => {
     setOpen(true);
   };
   const handleDrawerClose = () => {
     setOpen(false);
   };
+  const { signed } = useLockceptContext();
+
+  useEffect(() => {
+    if (!signed)
+      history.push({
+        pathname: "/signin",
+        search: `?goto=${encodeURI(
+          history.location.pathname + history.location.hash
+        )}`,
+      });
+  }, [signed, history]);
 
   return (
     <div className={classes.root}>
