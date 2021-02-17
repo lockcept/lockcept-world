@@ -47,7 +47,6 @@ const Signin = () => {
   const {
     instance,
     signed,
-    setSigned,
     setAccessToken,
     setSnackbar,
   } = useLockceptContext();
@@ -90,13 +89,11 @@ const Signin = () => {
       );
       const { token } = res.data;
       setAccessToken(token);
-      setSigned(true);
       setLoading(false);
       history.push(goto);
     } catch (e) {
       errorLogger(e);
       setAccessToken("");
-      setSigned(false);
       if (e.response) {
         const errorData = e.response.data;
         const errorName = errorData?.options?.name;
@@ -123,7 +120,6 @@ const Signin = () => {
     password,
     instance,
     setAccessToken,
-    setSigned,
     history,
     setSnackbar,
   ]);

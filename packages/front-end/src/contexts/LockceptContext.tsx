@@ -1,7 +1,13 @@
 import { UserData } from "@lockcept/shared";
 import Axios, { AxiosInstance } from "axios";
 import jwt from "jsonwebtoken";
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import AlertSnackbar, {
   CustomSnackbarProps,
 } from "../components/AlertSnackbar";
@@ -27,7 +33,6 @@ const getHttpEndPoints = () => {
 export interface LockceptContextProps {
   instance: AxiosInstance;
   signed: boolean;
-  setSigned: (signed: boolean) => void;
   accessToken: string;
   setAccessToken: (accessToken: string) => void;
   signedUserData: Omit<UserData, "password"> | null;
@@ -38,7 +43,6 @@ const LockceptContext = createContext<LockceptContextProps>({
     baseURL: getHttpEndPoints(),
   }),
   signed: false,
-  setSigned: () => {},
   accessToken: "",
   setAccessToken: () => {},
   signedUserData: null,
@@ -80,12 +84,26 @@ export const LockceptContextProvider = ({ children }: Props): JSX.Element => {
     setCustomSnackbarProps({ ...props, message });
   };
 
+  useEffect(() => {
+    const storageAccessToken = localStorage.getItem("userAccessToken");
+    if (storageAccessToken) {
+      setAccessToken(storageAccessToken);
+      setSigned(true);
+    }
+  }, []);
+
+  const setAccessTokenWithStorage = (inputAccessToken: string) => {
+    localStorage.setItem("userAccessToken", inputAccessToken);
+    setAccessToken(inputAccessToken);
+    if (inputAccessToken) setSigned(true);
+    else setSigned(false);
+  };
+
   const value = {
     instance,
     signed,
-    setSigned,
     accessToken,
-    setAccessToken,
+    setAccessToken: setAccessTokenWithStorage,
     signedUserData,
     setSnackbar,
   };

@@ -9,5 +9,8 @@ export const config = {
   },
   key: {
     JWT_USER: "BPvwjfOhgllockcept",
+    GOOGLE_CLIENT_ID:
+      "179614458237-l0eu34dv9s99im7p3nlk67a8c2cc6714.apps.googleusercontent.com",
+    GOOGLE_CLIENT_SECRET: "Zvn9Dk3PEngoHPhB7pYBHFTf",
   },
 };
