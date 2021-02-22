@@ -15,7 +15,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import queryString from "query-string";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import Copyright from "../../components/Copyright";
 import { useLockceptContext } from "../../contexts";
@@ -70,6 +70,11 @@ const Signin = () => {
     },
     []
   );
+  useEffect(() => {
+    let goto = query?.goto;
+    if (!goto || typeof goto !== "string") goto = "/";
+    if (signed) history.push(goto);
+  }, [signed, history, query]);
   const handleSignin = useCallback(async () => {
     if (signed) return;
     if (!validateEmail(email)) {
