@@ -87,6 +87,11 @@ export const LockceptContextProvider = ({ children }: Props): JSX.Element => {
   useEffect(() => {
     const storageAccessToken = localStorage.getItem("userAccessToken");
     if (storageAccessToken) {
+      const decoded = jwt.decode(storageAccessToken);
+      if (!decoded) return;
+      if (typeof decoded === "string") return;
+      if (decoded.exp < Date.now() / 1000) return;
+
       setAccessToken(storageAccessToken);
       setSigned(true);
     }
