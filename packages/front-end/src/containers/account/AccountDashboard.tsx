@@ -86,7 +86,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!signed)
-      history.push({
+      history.replace({
         pathname: "/signin",
         search: `?goto=${encodeURI(
           history.location.pathname + history.location.hash
