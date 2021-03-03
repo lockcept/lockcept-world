@@ -19,6 +19,7 @@ import { useHistory } from "react-router-dom";
 import Copyright from "../../components/Copyright";
 import { useLockceptContext } from "../../contexts";
 import { errorLogger } from "../../logger";
+import Axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -89,6 +90,24 @@ const Signup = () => {
       setLoading(false);
     }
   }, [loading, passwords, email, userName, instance, history, setSnackbar]);
+
+  const handleSignupGoogle = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      window.open('http://localhost:4000/signup/google');
+      setLoading(false);
+    } catch (e) {
+      errorLogger(e);
+      if (e.response) {
+        setSnackbar(
+          { severity: "error" },
+          e.response.message ?? "Unknown Error"
+        );
+      }
+      setLoading(false);
+    }
+  }, [instance, loading, setSnackbar]);
 
   const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputEmail = event.target.value;
@@ -246,6 +265,16 @@ const Signup = () => {
           >
             Sign Up
           </Button>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            onClick={handleSignupGoogle}
+            disabled={loading}
+          >
+            Sign Up Google
+          </Button>
           <Grid container justify="flex-end">
             <Grid item>
               <Link href="/signin" variant="body2">
@@ -258,7 +287,8 @@ const Signup = () => {
       <Box mt={5}>
         <Copyright />
       </Box>
-    </Container>
+      <a href="http://localhost:4000/signup/google">Sign Up</a>
+  </Container>
   );
 };
 

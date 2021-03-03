@@ -7,7 +7,7 @@ import {
 } from "@lockcept/shared";
 import express from "express";
 import jwt from "jsonwebtoken";
-import { omit } from "lodash";
+import { pick } from "lodash";
 import { config } from "../../config";
 import { errorLogger } from "../../logger";
 import User from "../../models/user";
@@ -25,9 +25,13 @@ router.post("/users/:userId/email", async (req, res) => {
       res.sendStatus(403);
     }
     await user.setEmail(email);
-    const token = jwt.sign(omit({ ...user.data, email }, "password"), jwtKey, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      pick({ ...user.data, email }, "id", "email", "userName"),
+      jwtKey,
+      {
+        expiresIn: "1d",
+      }
+    );
     const resBody: SigninLocalResponse = { token };
     res.json(resBody);
   } catch (e) {
@@ -50,9 +54,13 @@ router.post("/users/:userId/password", async (req, res) => {
       res.sendStatus(403);
     }
     await user.setPassword(password);
-    const token = jwt.sign(omit({ ...user.data }, "password"), jwtKey, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      pick({ ...user.data }, "id", "email", "userName"),
+      jwtKey,
+      {
+        expiresIn: "1d",
+      }
+    );
     const resBody: SigninLocalResponse = { token };
     res.json(resBody);
   } catch (e) {
@@ -76,7 +84,7 @@ router.post("/users/:userId/username/", async (req, res) => {
     }
     await user.setUserName(userName);
     const token = jwt.sign(
-      omit({ ...user.data, userName }, "password"),
+      pick({ ...user.data, userName }, "id", "email", "userName"),
       jwtKey,
       {
         expiresIn: "1d",
@@ -104,7 +112,10 @@ router.get("/users/:userId", async (req, res) => {
       return;
     }
     const userResponseData: UserDataResponse = {
-      userData: omit(user.data, "password", "id"),
+      userData: {
+        email: user.data.isFakeEmail ? "" : user.data.email,
+        userName: user.data.userName,
+      },
     };
     res.status(200).json(userResponseData);
   } catch (e) {

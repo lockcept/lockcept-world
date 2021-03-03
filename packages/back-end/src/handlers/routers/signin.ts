@@ -117,11 +117,6 @@ signinRouter.post("/auth/local", (req, res) => {
 /**
  * signin google (WIP)
  */
-signinRouter.post("/google", (req, res) => {
-  res.json({
-    message: "signin",
-  });
-});
 
 signinRouter.post("/auth/google", (req, res) => {
   res.json({

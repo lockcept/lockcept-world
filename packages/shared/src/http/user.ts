@@ -1,7 +1,7 @@
 import { UserData } from "../tables";
 
 export interface SignupLocalRequest {
-  userData: Omit<UserData, "id">;
+  userData: Pick<UserData, "email" | "password" | "userName">;
 }
 
 export interface SigninLocalRequest {
@@ -26,5 +26,5 @@ export interface UpdateUserNameRequest {
 }
 
 export interface UserDataResponse {
-  userData: Omit<UserData, "password" | "id">;
+  userData: Pick<UserData, "email" | "userName">;
 }

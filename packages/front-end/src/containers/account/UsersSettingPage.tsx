@@ -42,9 +42,9 @@ const UserSettingPage = () => {
     setSnackbar,
   } = useLockceptContext();
 
-  const [userData, setUserData] = useState<Omit<
+  const [userData, setUserData] = useState<Pick<
     UserData,
-    "id" | "password"
+    "email" | "userName"
   > | null>(null);
 
   const [email, setEmail] = useState<string>("");
@@ -228,43 +228,45 @@ const UserSettingPage = () => {
 
   return (
     <Container maxWidth="lg">
-      <Card className={classes.card}>
-        <Toolbar>
-          <Typography variant="subtitle1" color="textSecondary">
-            Update Email
-          </Typography>
-          <Box flex={1} />
-        </Toolbar>
-        <CardContent>
-          <Box display="flex">
-            <Box flexGrow={1}>
-              <TextField
-                variant="outlined"
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                value={email}
-                error={emailValidation.length > 0}
-                helperText={emailValidation}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-              />
+      {email && (
+        <Card className={classes.card}>
+          <Toolbar>
+            <Typography variant="subtitle1" color="textSecondary">
+              Update Email
+            </Typography>
+            <Box flex={1} />
+          </Toolbar>
+          <CardContent>
+            <Box display="flex">
+              <Box flexGrow={1}>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  value={email}
+                  error={emailValidation.length > 0}
+                  helperText={emailValidation}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                  }}
+                />
+              </Box>
+              <IconButton
+                onClick={handleEmailUpdate}
+                disabled={
+                  emailValidation.length > 0 ||
+                  !email ||
+                  email === userData?.email
+                }
+              >
+                <ChevronRightIcon />
+              </IconButton>
             </Box>
-            <IconButton
-              onClick={handleEmailUpdate}
-              disabled={
-                emailValidation.length > 0 ||
-                !email ||
-                email === userData?.email
-              }
-            >
-              <ChevronRightIcon />
-            </IconButton>
-          </Box>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
       <Card className={classes.card}>
         <Toolbar>
           <Typography variant="subtitle1" color="textSecondary">

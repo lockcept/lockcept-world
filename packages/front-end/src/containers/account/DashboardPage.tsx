@@ -35,9 +35,9 @@ const DashboardPage = () => {
   const { instance, signedUserData } = useLockceptContext();
   const history = useHistory();
 
-  const [userData, setUserData] = useState<Omit<
+  const [userData, setUserData] = useState<Pick<
     UserData,
-    "id" | "password"
+    "email" | "userName"
   > | null>(null);
   const [accountData, setAccountData] = useState<AccountData | null>(null);
 
@@ -98,10 +98,12 @@ const DashboardPage = () => {
           <CardContent>
             <Table>
               <TableBody>
-                <TableRow key="email">
-                  <TableCell width="10%">Email</TableCell>
-                  <TableCell>{userData?.email}</TableCell>
-                </TableRow>
+                {userData?.email && (
+                  <TableRow key="email">
+                    <TableCell width="10%">Email</TableCell>
+                    <TableCell>{userData?.email}</TableCell>
+                  </TableRow>
+                )}
                 <TableRow key="user-name">
                   <TableCell width="10%">Name</TableCell>
                   <TableCell>{userData?.userName}</TableCell>
