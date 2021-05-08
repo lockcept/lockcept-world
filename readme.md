@@ -1,6 +1,6 @@
 # lockcept world
 
-lockcept world (https://lockcept.kr)
+lockcept world <s>https://lockcept.kr</s> 2021.05 closed
 
 ## Packages
 
@@ -25,12 +25,14 @@ typescript, serverless, AWS APIGateway & lambda, dynamodb
 
 ### shared
 
-type sharing (front-end, back-end)
+type sharing (front-end, back-end)  
+use `yarn link` to link with other packages  
+`yarn dev` for tsc build
 
 ## Services
 
 ### Account
 
-### League Of Legend Stats
+### <s> League Of Legend Stats </s>
 
-### Homework Planner
+### <s> Homework Planner </s>
